@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+
+  # client:
+  #   container_name: frontend
+  #   build:
+  #     context: ./
+  #     dockerfile: ./docker/frontend/Dockerfile
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - ./frontend:/data
+  #   environment:
+  #     - API_URL=http://localhost:8080/
+  #   # command: ["npm", "run", "serve"]
+
+  mongo:
+    container_name: mongo
+    build:
+      context: ./
+      dockerfile: ./docker/mongo/Dockerfile
+    volumes:
+      - ./data:/data/mongo
+    ports:
+      - "27017:27017"
+    expose:
+      - 27017
+
+  server:
+    container_name: server
+    restart: always
+    command: ./node_modules/nodemon/bin/nodemon.js --watch *.js
+    build:
+      context: ./
+      dockerfile: ./docker/server/Dockerfile
+    # environment:
+    #  - MONGODB_URI=mongodb://mongo:27017/test
+    ports:
+      - "8123:8123"
+    links:
+      - mongo
