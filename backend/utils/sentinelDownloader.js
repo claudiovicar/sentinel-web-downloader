@@ -42,22 +42,38 @@ function readCSV(path) {
   // const stream = fs.createReadStream("/home/claudio/Downloads/sample.csv");
   const stream = fs.createReadStream(path);
 
+  let registers = [];
+
   fastCSV
     .fromStream(stream, {headers: csvHeaders})
     .on("data", function(data){
       if (data && Object.keys(data).length === csvHeaders.length && data['granule_id'] !== 'GRANULE_ID') {
-        new SentinelTile(data).save()
-        .catch((err) => {
-          console.log(`Erro ao processar registro ${err.toString()}`);
-          console.log(data);
-        });
+        registers.push(data);
+
+        if (registers.length > 1000) {
+          console.log("Inserting in the database...");
+          SentinelTile.insertMany(registers)
+            .then(() => {console.log('Dados inseridos com sucesso!');})
+            .catch(() => {console.error('Erro ao inserir dados no banco.');});
+          registers = [];
+        }
+
+        // new SentinelTile(data).save()
+        // .catch((err) => {
+        //   console.log(`Erro ao processar registro ${err.toString()}`);
+        //   console.log(data);
+        // });
       }
       else{
-        console.log(`Erro ao processar registro ${data}`);
+        console.log(`Erro ao processar registro ${JSON.stringify(data)}`);
       }
     })
     .on("end", function(){
-      console.log("done");
+      console.log("Done reading CSV.");
+      // console.log("Inserting in the database...");
+      // SentinelTile.insertMany(registers)
+      // .then(() => {console.log('Dados inseridos com sucesso!');})
+      // .catch(() => {console.error('Erro ao inserir dados no banco.');});
     });
 
 }
