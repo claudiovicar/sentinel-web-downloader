@@ -19,19 +19,20 @@ const MAP_CONFIG = {
 
 const STYLES = {
   grid: {
-    default : {
+    default: {
       fill: 'grey',
-      fillOpacity: .1,
+      fillOpacity: 0.1,
       color: 'grey',
+      weight: 1,
     },
     selected: {
       color: 'orange',
       fill: 'orange',
-      fillOpacity: 0.6
+      fillOpacity: 0.6,
     },
   },
   brasil: {
-    default : {
+    default: {
       fill: false,
       color: 'steelblue',
     },
@@ -61,35 +62,38 @@ export default {
       this.map.addLayer(osm);
 
       this.loadUFs().then(this.loadGrid);
-
     },
 
-    loadUFs () {
+    loadUFs() {
       return geo.getUFs().then((response) => {
         L.geoJSON(response.data, { style: STYLES.brasil.default }).addTo(this.map);
       });
     },
 
-    loadGrid () {
+    loadGrid() {
       geo.getGridSentinel().then((response) => {
-        L.geoJSON(response.data, {
+        this.grid = L.geoJSON(response.data, {
           style: STYLES.grid.default,
           onEachFeature: (feature, layer) => {
+            // eslint-disable-next-line
             layer.selected = false;
             layer.on({
               click: this.gridClicked,
             });
+            layer.bindTooltip(feature.properties.TileID);
           },
-        }).addTo(this.map);
+        });
+        this.grid.addTo(this.map);
+        this.map.fitBounds(this.grid.getBounds());
       });
     },
 
     gridClicked(event) {
-      let layer = event.sourceTarget;
+      const layer = event.sourceTarget;
       layer.selected = !layer.selected;
       if (layer.selected) {
         layer.setStyle(STYLES.grid.selected);
-      }else {
+      } else {
         layer.setStyle(STYLES.grid.default);
       }
     },
