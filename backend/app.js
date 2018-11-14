@@ -37,6 +37,8 @@ const homeController = require('./controllers/home');
  */
 const passportConfig = require('./config/passport');
 
+var isProduction = process.env.NODE_ENV === 'production';
+
 /**
  * Create Express server.
  */
@@ -45,6 +47,14 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
+
+if(isProduction){
+  mongoose.connect(process.env.MONGODB_URI);
+} else {
+  mongoose.connect('mongodb://localhost/sentinel');
+  // mongoose.set('debug', true);
+}
+
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
