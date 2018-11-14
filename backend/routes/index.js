@@ -1,9 +1,9 @@
-import express from 'express';
+var router = require('express').Router();
 
-const routes = express.Router();
-
-routes.get('/', (req, res) => {
+router.get('/', (req, res) => {
   res.status(200).json({ message: 'Ok' });
 });
 
-module.exports = routes;
+router.use('/geo', require('./api/geo'));
+
+module.exports = router;

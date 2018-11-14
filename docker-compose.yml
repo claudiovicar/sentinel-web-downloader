@@ -27,16 +27,16 @@ services:
     expose:
       - 27017
 
-  server:
-    container_name: server
-    restart: always
-    command: ./node_modules/nodemon/bin/nodemon.js --watch *.js
-    build:
-      context: ./
-      dockerfile: ./docker/server/Dockerfile
-    # environment:
-    #  - MONGODB_URI=mongodb://mongo:27017/test
-    ports:
-      - "8123:8123"
-    links:
-      - mongo
+  # server:
+  #   container_name: server
+  #   restart: always
+  #   command: ./node_modules/nodemon/bin/nodemon.js --watch *.js
+  #   build:
+  #     context: ./
+  #     dockerfile: ./docker/server/Dockerfile
+  #   # environment:
+  #   #  - MONGODB_URI=mongodb://mongo:27017/test
+  #   ports:
+  #     - "8123:8123"
+  #   links:
+  #     - mongo
