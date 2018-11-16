@@ -1,18 +1,66 @@
 <template lang="pug">
 
-  div.float-box
-    h1 Oi
+  div.float-box.col-sm-6.col-lg-3
+
+    div.container
+
+      div.row
+
+        div
+          label Selecione os tiles:
+          multiselect(
+            v-model="tile",
+            :options="tiles",
+            :multiple="true",
+            :close-on-select="false",
+            :clear-on-select="false",
+            :preserve-search="true",
+            placeholder="Selecione..."
+            label="id",
+            track-by="id",
+            :preselect-first="false",
+            @input="action",
+            @select="action"
+          )
+            template(slot="option", slot-scope="props", @click="mouseover")
+              .option__desc
+                span.option__title {{ props.option.id }}
+                //- span.option__small {{ props.option.desc }}
 
 </template>
 
 <script>
 
+import Multiselect from 'vue-multiselect';
+
+import sentinel from '@/services/sentinel';
+
 export default {
   name: 'SidePane',
+  components: {
+    Multiselect,
+  },
   data() {
     return {
       expanded: false,
+      tile: null,
+      tiles: [],
     };
+  },
+  methods: {
+    action(event) {
+      // eslint-disable-next-line
+      console.log(event);
+    },
+    mouseover(event) {
+      // eslint-disable-next-line
+      console.log(event);
+    },
+  },
+  mounted() {
+    sentinel.getTileList().then((response) => {
+      this.tiles = response.data;
+    });
   },
 };
 </script>
