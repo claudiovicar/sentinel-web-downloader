@@ -5,5 +5,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/geo', require('./api/geo'));
+router.use('/sentinel', require('./api/sentinel'));
 
 module.exports = router;

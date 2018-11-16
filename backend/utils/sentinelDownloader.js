@@ -4,7 +4,8 @@ const asyncGunzip = promisify(require('gunzip-file'));
 const fastCSV = require('fast-csv');
 const fs = require('fs');
 
-const SentinelTile = require('../models/SentinelTile')
+const SentinelScene = require('../models/SentinelScene');
+const SentinelTile = require('../models/SentinelTile');
 
 const SENTINEL2_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-sentinel-2/index.csv.gz';
 // const SENTINEL2_METADATA_URL = 'http://ufpr.dl.sourceforge.net/project/od1n/samples.tar.gz';
@@ -12,7 +13,14 @@ const SENTINEL2_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-se
 const csvHeaders = ['granule_id', 'product_id', 'datatake_identifier', 'tile_id', 'sensing_time', 'total_size', 'cloud_cover',
 'geometric_quality_flag', 'generation_time', 'north_lat', 'south_lat', 'west_lon', 'east_lon', 'base_url'];
 
+let tileIDs = [];
+
 async function fetchScenes() {
+
+  console.log('Carregando ids dos tiles de interesse');
+  fillTileIds();
+  // console.log(tileIDs);
+
   console.log('Buscando cenas Sentinel');
   let tempTar = fileUtils.createTempFile();
   let tempCSV = fileUtils.createTempFile();
@@ -48,21 +56,28 @@ function readCSV(path) {
     .fromStream(stream, {headers: csvHeaders})
     .on("data", function(data){
       if (data && Object.keys(data).length === csvHeaders.length && data['granule_id'] !== 'GRANULE_ID') {
-        registers.push(data);
 
-        if (registers.length > 1000) {
-          console.log("Inserting in the database...");
-          SentinelTile.insertMany(registers)
-            .then(() => {console.log('Dados inseridos com sucesso!');})
-            .catch(() => {console.error('Erro ao inserir dados no banco.');});
-          registers = [];
+        if(tileIDs.indexOf(data.tile_id) >= 0) {
+          SentinelTile.findOne({id: data.tile_id}).exec()
+          .then(tile => {
+
+            data.tile = tile;
+            registers.push(data);
+
+            if (registers.length > 1000) {
+              console.log("Inserting in the database...");
+              SentinelScene.insertMany(registers)
+                .then(() => {console.log('Dados inseridos com sucesso!');})
+                .catch((e) => {
+                  console.error('Erro ao inserir dados no banco.');
+                  console.error(e);
+                });
+              registers = [];
+            }
+
+          });
         }
 
-        // new SentinelTile(data).save()
-        // .catch((err) => {
-        //   console.log(`Erro ao processar registro ${err.toString()}`);
-        //   console.log(data);
-        // });
       }
       else{
         console.log(`Erro ao processar registro ${JSON.stringify(data)}`);
@@ -70,11 +85,27 @@ function readCSV(path) {
     })
     .on("end", function(){
       console.log("Done reading CSV.");
-      // console.log("Inserting in the database...");
-      // SentinelTile.insertMany(registers)
-      // .then(() => {console.log('Dados inseridos com sucesso!');})
-      // .catch(() => {console.error('Erro ao inserir dados no banco.');});
     });
+
+}
+
+// Abre o geojson do brasil
+// Extrai os tile_ids
+// Insere em um array
+// TODO: Colocar o path do geojson do brasil no .env
+function fillTileIds() {
+
+  let geojson = JSON.parse(fs.readFileSync('public/geojson/sentinel-grid.geojson', 'utf8'));
+
+  geojson.features.forEach(feature => {
+
+    tileIDs.push(feature.properties.TileID);
+
+    let sentinelTile = new SentinelTile({id: feature.properties.TileID});
+
+    sentinelTile.save();
+
+  });
 
 }
 
