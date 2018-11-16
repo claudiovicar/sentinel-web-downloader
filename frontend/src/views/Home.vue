@@ -1,6 +1,8 @@
 <template lang="pug">
 
   div#base
+    .row
+      Header
     Map
     SidePane
 
@@ -10,12 +12,14 @@
 
 import Map from '@/components/Map.vue';
 import SidePane from '@/components/SidePane.vue';
+import Header from '@/components/Header.vue';
 
 export default {
   name: 'Main',
   components: {
     Map,
     SidePane,
+    Header,
   },
 };
 

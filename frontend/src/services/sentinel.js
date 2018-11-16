@@ -8,8 +8,12 @@ function fullURL(path) {
 
 export default {
 
-  getTileList() {
-    return axios.get(fullURL('/list/tiles'));
+  tileList() {
+    return axios.get(fullURL('/tiles/list'));
+  },
+
+  dateRange() {
+    return axios.get(fullURL('/dateRange'));
   },
 
 };

@@ -19,20 +19,7 @@ var SentinelSceneSchema = new mongoose.Schema({
   base_url: {type: String}
 });
 
-// ArticleSchema.methods.toJSONFor = function(user){
-//   return {
-//     slug: this.slug,
-//     title: this.title,
-//     description: this.description,
-//     body: this.body,
-//     createdAt: this.createdAt,
-//     updatedAt: this.updatedAt,
-//     tagList: this.tagList,
-//     favorited: user ? user.isFavorite(this._id) : false,
-//     favoritesCount: this.favoritesCount,
-//     author: this.author.toProfileJSONFor(user)
-//   };
-// };
+SentinelSceneSchema.index({sensing_time: 1});
 
 var SentinelScene = mongoose.model('SentinelScene', SentinelSceneSchema);
 

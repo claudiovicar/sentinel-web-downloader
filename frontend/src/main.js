@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import BootstrapVue from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
+import Octicon from 'vue-octicon/components/Octicon.vue';
 
 import App from './App.vue';
 import router from './router';
@@ -19,6 +20,7 @@ Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
 Vue.use(Multiselect);
+Vue.use(Octicon);
 
 new Vue({
   router,

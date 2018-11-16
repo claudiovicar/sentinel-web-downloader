@@ -4,11 +4,12 @@
 
     div.container
 
-      div.row
+      form
 
-        div
-          label Selecione os tiles:
+        .form-group
+          label(for="tile-picker") Selecione os tiles:
           multiselect(
+            id="tile-picker",
             v-model="tile",
             :options="tiles",
             :multiple="true",
@@ -18,20 +19,47 @@
             placeholder="Selecione..."
             label="id",
             track-by="id",
-            :preselect-first="false",
-            @input="action",
-            @select="action"
+            :preselect-first="false"
           )
             template(slot="option", slot-scope="props", @click="mouseover")
               .option__desc
                 span.option__title {{ props.option.id }}
-                //- span.option__small {{ props.option.desc }}
+
+        .form-group
+          label(for="tile-date-picker") Intervalo de datas:
+          date-picker(
+            id="tile-date-picker",
+            v-model='date',
+            lang='pt-br',
+            :not-before="dates.min",
+            :not-after="dates.max",
+            range)
+
+        .form-group
+          label(for="tile-cloud-cover") Cobertura de nuvens:
+          div
+            input.form-control(
+              id="tile-cloud-cover",
+              type="number",
+              v-model="cloudCover",
+              min="0",
+              max="100")
+            //- label.col.mt-2 %
+
+        .form-group
+          button.btn.btn-primary.float-right
+            octicon.mr-2(name="search")
+            span(@click="filtrar()") Buscar
 
 </template>
 
 <script>
 
 import Multiselect from 'vue-multiselect';
+import DatePicker from 'vue2-datepicker';
+import Octicon from 'vue-octicon/components/Octicon.vue';
+
+import 'vue-octicon/icons/search';
 
 import sentinel from '@/services/sentinel';
 
@@ -39,27 +67,37 @@ export default {
   name: 'SidePane',
   components: {
     Multiselect,
+    DatePicker,
+    Octicon,
   },
   data() {
     return {
       expanded: false,
       tile: null,
       tiles: [],
+      date: null,
+      dates: {
+        min: new Date(),
+        max: new Date(),
+      },
+      cloudCover: 5,
     };
   },
   methods: {
-    action(event) {
-      // eslint-disable-next-line
-      console.log(event);
-    },
-    mouseover(event) {
-      // eslint-disable-next-line
-      console.log(event);
+    filtrar() {
+
     },
   },
   mounted() {
-    sentinel.getTileList().then((response) => {
+    sentinel.tileList().then((response) => {
       this.tiles = response.data;
+    });
+
+    sentinel.dateRange().then((response) => {
+      this.dates = {
+        min: new Date(response.data.min),
+        max: new Date(response.data.max),
+      };
     });
   },
 };
@@ -67,10 +105,14 @@ export default {
 
 <style lang="scss" scoped>
 
+#tile-date-picker {
+  width: 100%;
+}
+
 .float-box {
   z-index: 10000;
   position: absolute;
-  top: 0;
+  top: 60px;
   bottom: 0;
 
   width: 600px;
