@@ -10,7 +10,7 @@
           label(for="tile-picker") Selecione os tiles:
           multiselect(
             id="tile-picker",
-            v-model="tile",
+            v-model="selectedTiles",
             :options="tiles",
             :multiple="true",
             :close-on-select="false",
@@ -29,14 +29,14 @@
           label(for="tile-date-picker") Intervalo de datas:
           date-picker(
             id="tile-date-picker",
-            v-model='date',
+            v-model='selectedDates',
             lang='pt-br',
             :not-before="dates.min",
             :not-after="dates.max",
             range)
 
         .form-group
-          label(for="tile-cloud-cover") Cobertura de nuvens:
+          label(for="tile-cloud-cover") Cobertura de nuvens (%):
           div
             input.form-control(
               id="tile-cloud-cover",
@@ -44,12 +44,11 @@
               v-model="cloudCover",
               min="0",
               max="100")
-            //- label.col.mt-2 %
 
         .form-group
           button.btn.btn-primary.float-right
             octicon.mr-2(name="search")
-            span(@click="filtrar()") Buscar
+            span(@click.prevent.stop="filtrar()") Buscar
 
 </template>
 
@@ -73,19 +72,20 @@ export default {
   data() {
     return {
       expanded: false,
-      tile: null,
       tiles: [],
-      date: null,
+      selectedTiles: null,
       dates: {
         min: new Date(),
         max: new Date(),
       },
+      selectedDates: null,
       cloudCover: 5,
     };
   },
   methods: {
     filtrar() {
-
+      // eslint-disable-next-line
+      console.log(this.cloudCover, this.selectedDates, this.selectedTiles);
     },
   },
   mounted() {
