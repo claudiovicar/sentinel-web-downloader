@@ -45,10 +45,9 @@
               min="0",
               max="100")
 
-        .form-group
-          button.btn.btn-primary.float-right
-            octicon.mr-2(name="search")
-            span(@click.prevent.stop="filtrar()") Buscar
+      button.btn.btn-primary.float-right(@click="filtrar()")
+        octicon.mr-2(name="search")
+        span Buscar
 
 </template>
 
@@ -78,14 +77,17 @@ export default {
         min: new Date(),
         max: new Date(),
       },
-      selectedDates: null,
+      selectedDates: [],
       cloudCover: 5,
     };
   },
   methods: {
     filtrar() {
-      // eslint-disable-next-line
-      console.log(this.cloudCover, this.selectedDates, this.selectedTiles);
+      const dateRange = {
+        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dates.min,
+        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dates.max,
+      };
+      sentinel.filterScenes(this.selectedTiles, dateRange, this.cloudCover);
     },
   },
   mounted() {

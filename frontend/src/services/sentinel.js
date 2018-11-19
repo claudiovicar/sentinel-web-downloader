@@ -16,4 +16,13 @@ export default {
     return axios.get(fullURL('/dateRange'));
   },
 
+  filterScenes(tiles, dateRange, cloudCover) {
+    const params = {
+      tiles,
+      dateRange,
+      cloudCover,
+    };
+    return axios.post(fullURL('/filter'), params);
+  },
+
 };

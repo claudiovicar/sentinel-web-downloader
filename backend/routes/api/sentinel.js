@@ -10,7 +10,6 @@ router.get('/tiles/list', (req, res) => {
   });
 
 });
-var SentinelTile = require('../../models/SentinelTile');
 
 router.get('/dateRange', (req, res) => {
 
@@ -20,6 +19,15 @@ router.get('/dateRange', (req, res) => {
   ]).then(function(results) {
     res.json({min: results[0].sensing_time, max: results[1].sensing_time});
   });
+
+});
+
+router.post('/filter', (req, res) => {
+
+  SentinelScene.filter(req.body.tiles, req.body.dateRange, req.body.cloudCover)
+    .then(function(scenes) {
+      res.json(scenes);
+    });
 
 });
 
