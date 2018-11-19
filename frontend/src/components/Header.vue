@@ -1,25 +1,29 @@
 <template lang="pug">
 
   header
-    .float-right(v-if="dataUltimaAtualizacao")
-      label Última atualização: {{dataUltimaAtualizacao.toLocaleString('pt-br')}}
+    .float-right(v-if="dateRange.max")
+      label Última atualização: {{dateRange.max.toLocaleString('pt-br')}}
 
 </template>
 
 <script>
-import sentinel from '@/services/sentinel';
+import { mapGetters } from 'vuex';
+
+import { FETCH_SENTINEL_DATE_RANGE } from '@/store/actions.type';
 
 export default {
   name: 'Header',
   data() {
     return {
-      dataUltimaAtualizacao: null,
     };
   },
+  computed: {
+    ...mapGetters([
+      'dateRange',
+    ]),
+  },
   mounted() {
-    sentinel.dateRange().then((response) => {
-      this.dataUltimaAtualizacao = new Date(response.data.max);
-    });
+    this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
   },
 };
 </script>

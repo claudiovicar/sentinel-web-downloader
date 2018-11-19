@@ -31,8 +31,8 @@
             id="tile-date-picker",
             v-model='selectedDates',
             lang='pt-br',
-            :not-before="dates.min",
-            :not-after="dates.max",
+            :not-before="dateRange.min",
+            :not-after="dateRange.max",
             range)
 
         .form-group
@@ -61,6 +61,12 @@ import 'vue-octicon/icons/search';
 
 import sentinel from '@/services/sentinel';
 
+import { mapGetters } from 'vuex';
+
+import {
+  FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE,
+} from '@/store/actions.type';
+
 export default {
   name: 'SidePane',
   components: {
@@ -71,12 +77,7 @@ export default {
   data() {
     return {
       expanded: false,
-      tiles: [],
       selectedTiles: null,
-      dates: {
-        min: new Date(),
-        max: new Date(),
-      },
       selectedDates: [],
       cloudCover: 5,
     };
@@ -84,23 +85,22 @@ export default {
   methods: {
     filtrar() {
       const dateRange = {
-        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dates.min,
-        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dates.max,
+        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
+        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
       sentinel.filterScenes(this.selectedTiles, dateRange, this.cloudCover);
     },
   },
+  computed: {
+    ...mapGetters([
+      'tiles',
+      'selectedTiles',
+      'dateRange',
+    ]),
+  },
   mounted() {
-    sentinel.tileList().then((response) => {
-      this.tiles = response.data;
-    });
-
-    sentinel.dateRange().then((response) => {
-      this.dates = {
-        min: new Date(response.data.min),
-        max: new Date(response.data.max),
-      };
-    });
+    this.$store.dispatch(FETCH_SENTINEL_TILES);
+    this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
   },
 };
 </script>
