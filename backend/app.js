@@ -98,11 +98,12 @@ app.use(flash());
 //     lusca.csrf()(req, res, next);
 //   }
 // });
-app.use(lusca.csrf());
+// app.use(lusca.csrf({name: 'X-CSRF-TOKEN'}));
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
 app.use((req, res, next) => {
+  // res.cookie('X-CSRF-TOKEN', res.locals._csrf, {httpOnly: false});
   res.locals.user = req.user;
   next();
 });
@@ -125,6 +126,9 @@ app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 3155760000
 // app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
 // app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
 // app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+
+// X-CSRF-TOKEN
+// https://github.com/krakenjs/lusca/issues/95
 
 /**
  * Primary app routes.
