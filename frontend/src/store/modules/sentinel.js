@@ -1,8 +1,17 @@
-import { SET_TILES, SET_DATE_RANGE, SET_SCENES } from '../mutations.type';
+import {
+  SET_TILES,
+  SET_DATE_RANGE,
+  SET_SCENES,
+  ADD_SELECTED_TILE,
+  REMOVE_SELECTED_TILE,
+} from '../mutations.type';
+
 import {
   FETCH_SENTINEL_TILES,
   FETCH_SENTINEL_DATE_RANGE,
   FILTER_SENTINEL_SCENES,
+  SELECT_TILE,
+  UNSELECT_TILE,
 } from '../actions.type';
 
 import sentinel from '@/services/sentinel';
@@ -30,6 +39,19 @@ export default {
     [SET_DATE_RANGE](state, dateRange) {
       state.dateRange = dateRange;
     },
+    [ADD_SELECTED_TILE](state, tile) {
+      if (state.selectedTiles.indexOf(tile) < 0) {
+        state.selectedTiles.push(tile);
+      }
+    },
+    [REMOVE_SELECTED_TILE](state, tile) {
+      // const index = state.selectedTiles.indexOf(tile);
+      const index = state.selectedTiles.findIndex(t => t.id === tile.id);
+      if (index >= 0) {
+        state.selectedTiles.splice(index, 1);
+      }
+      state.selectedTiles = [...state.selectedTiles];
+    },
   },
   actions: {
     [FETCH_SENTINEL_TILES](context) {
@@ -50,6 +72,12 @@ export default {
       sentinel.filterScenes(selectedTiles, dateRange, cloudCover).then(({ data }) => {
         context.commit(SET_SCENES, data);
       });
+    },
+    [SELECT_TILE](context, tile) {
+      context.commit(ADD_SELECTED_TILE, tile);
+    },
+    [UNSELECT_TILE](context, tile) {
+      context.commit(REMOVE_SELECTED_TILE, tile);
     },
   },
 };

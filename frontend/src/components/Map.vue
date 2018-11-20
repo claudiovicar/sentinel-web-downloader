@@ -10,33 +10,13 @@ import L from 'leaflet';
 
 import geo from '@/services/geo';
 
+import mapGrid from '@/mixins/mapGrid';
+
+import { MAP_STYLES } from '@/config';
+
 const MAP_CONFIG = {
   center: [-16.678293098288503, -54.5361328125],
   zoom: 4,
-  // minZoom: 1,
-  // maxZoom: 17,
-};
-
-const STYLES = {
-  grid: {
-    default: {
-      fill: 'grey',
-      fillOpacity: 0.1,
-      color: 'grey',
-      weight: 1,
-    },
-    selected: {
-      color: 'orange',
-      fill: 'orange',
-      fillOpacity: 0.6,
-    },
-  },
-  brasil: {
-    default: {
-      fill: false,
-      color: 'steelblue',
-    },
-  },
 };
 
 export default {
@@ -48,6 +28,10 @@ export default {
   data() {
     return {};
   },
+
+  mixins: [
+    mapGrid,
+  ],
 
   methods: {
 
@@ -66,36 +50,8 @@ export default {
 
     loadUFs() {
       return geo.getUFs().then((response) => {
-        L.geoJSON(response.data, { style: STYLES.brasil.default }).addTo(this.map);
+        L.geoJSON(response.data, { style: MAP_STYLES.brasil.default }).addTo(this.map);
       });
-    },
-
-    loadGrid() {
-      geo.getGridSentinel().then((response) => {
-        this.grid = L.geoJSON(response.data, {
-          style: STYLES.grid.default,
-          onEachFeature: (feature, layer) => {
-            // eslint-disable-next-line
-            layer.selected = false;
-            layer.on({
-              click: this.gridClicked,
-            });
-            layer.bindTooltip(feature.properties.TileID);
-          },
-        });
-        this.grid.addTo(this.map);
-        this.map.fitBounds(this.grid.getBounds());
-      });
-    },
-
-    gridClicked(event) {
-      const layer = event.sourceTarget;
-      layer.selected = !layer.selected;
-      if (layer.selected) {
-        layer.setStyle(STYLES.grid.selected);
-      } else {
-        layer.setStyle(STYLES.grid.default);
-      }
     },
 
   },

@@ -10,7 +10,7 @@
           label(for="tile-picker") Selecione os tiles:
           multiselect(
             id="tile-picker",
-            v-model="selectedTiles",
+            :value="selectedTiles",
             :options="tiles",
             :multiple="true",
             :close-on-select="false",
@@ -19,7 +19,9 @@
             placeholder="Selecione..."
             label="id",
             track-by="id",
-            :preselect-first="false"
+            :preselect-first="false",
+            @select="selectTile",
+            @remove="unselectTile"
           )
             template(slot="option", slot-scope="props", @click="mouseover")
               .option__desc
@@ -45,7 +47,7 @@
               min="0",
               max="100")
 
-      button.btn.btn-primary.float-right(@click="filtrar()")
+      button.btn.btn-primary.float-right(@click="filter()")
         octicon.mr-2(name="search")
         span Buscar
 
@@ -64,7 +66,7 @@ import sentinel from '@/services/sentinel';
 import { mapGetters } from 'vuex';
 
 import {
-  FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE,
+  FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
 } from '@/store/actions.type';
 
 export default {
@@ -77,18 +79,23 @@ export default {
   data() {
     return {
       expanded: false,
-      selectedTiles: null,
       selectedDates: [],
       cloudCover: 5,
     };
   },
   methods: {
-    filtrar() {
+    filter() {
       const dateRange = {
         min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
         max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
       sentinel.filterScenes(this.selectedTiles, dateRange, this.cloudCover);
+    },
+    selectTile(tile) {
+      this.$store.dispatch(SELECT_TILE, tile);
+    },
+    unselectTile(tile) {
+      this.$store.dispatch(UNSELECT_TILE, tile);
     },
   },
   computed: {
