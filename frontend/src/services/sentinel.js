@@ -13,7 +13,7 @@ export default {
   },
 
   dateRange() {
-    return axios.get(fullURL('/dateRange'));
+    return axios.get(fullURL('/scenes/dateRange'));
   },
 
   filterScenes(tiles, dateRange, cloudCover) {
@@ -22,7 +22,7 @@ export default {
       dateRange,
       cloudCover,
     };
-    return axios.post(fullURL('/filter'), params);
+    return axios.post(fullURL('/scenes/filter'), params);
   },
 
 };

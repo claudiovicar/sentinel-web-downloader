@@ -61,12 +61,11 @@ import Octicon from 'vue-octicon/components/Octicon.vue';
 
 import 'vue-octicon/icons/search';
 
-import sentinel from '@/services/sentinel';
-
 import { mapGetters } from 'vuex';
 
 import {
   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
+  FILTER_SENTINEL_SCENES,
 } from '@/store/actions.type';
 
 export default {
@@ -89,7 +88,9 @@ export default {
         min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
         max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
-      sentinel.filterScenes(this.selectedTiles, dateRange, this.cloudCover);
+      this.$store.dispatch(FILTER_SENTINEL_SCENES, {
+        selectedTiles: this.selectedTiles, dateRange: dateRange, cloudCover: this.cloudCover
+      });
     },
     selectTile(tile) {
       this.$store.dispatch(SELECT_TILE, tile);

@@ -5,6 +5,7 @@
       Header
     Map
     SidePane
+    RightPane
 
 </template>
 
@@ -12,6 +13,7 @@
 
 import Map from '@/components/Map.vue';
 import SidePane from '@/components/SidePane.vue';
+import RightPane from '@/components/RightPane.vue';
 import Header from '@/components/Header.vue';
 
 export default {
@@ -19,6 +21,7 @@ export default {
   components: {
     Map,
     SidePane,
+    RightPane,
     Header,
   },
 };
