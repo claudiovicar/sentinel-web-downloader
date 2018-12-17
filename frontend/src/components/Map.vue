@@ -9,8 +9,8 @@
 import L from 'leaflet';
 
 import geo from '@/services/geo';
-
 import mapGrid from '@/mixins/mapGrid';
+import mapScenePreview from '@/mixins/mapScenePreview';
 
 import { MAP_STYLES } from '@/config';
 
@@ -30,7 +30,8 @@ export default {
   },
 
   mixins: [
-    mapGrid,
+    mapGrid, /** Mixin que gerencia o grid no mapa */
+    mapScenePreview,  /** Mixin que gerencia os previews de cenas no mapa */
   ],
 
   methods: {
@@ -45,7 +46,8 @@ export default {
 
       this.map.addLayer(osm);
 
-      this.loadUFs().then(this.loadGrid);
+      // this.loadUFs().then(this.loadGrid);
+      this.loadUFs();
     },
 
     loadUFs() {

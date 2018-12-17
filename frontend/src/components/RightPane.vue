@@ -4,47 +4,35 @@
 
     div.container
 
-      h1 Right pane
+      h2 {{inspectedTile.id}} - {{scenes[inspectedTile.id].length}} cenas
 
-      ul
-        li(v-for="scene in scenes[inspectedTile.id]") {{scene.cloud_cover}}
+      ul.d-flex.justify-content-center.flex-wrap
+        li(v-for="scene in scenes[inspectedTile.id]")
+          tile-preview(:scene="scene")
 
 </template>
 
 <script>
 
-// import Multiselect from 'vue-multiselect';
-// import DatePicker from 'vue2-datepicker';
-// import Octicon from 'vue-octicon/components/Octicon.vue';
-
-// import 'vue-octicon/icons/search';
-
-// import sentinel from '@/services/sentinel';
-
 import { mapGetters } from 'vuex';
 
-// import {
-//   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
-// } from '@/store/actions.type';
+import TilePreview from './TilePreview.vue';
 
 export default {
   name: 'RightPane',
   components: {
+    TilePreview,
   },
   data() {
     return {
       showPane: true,
     };
   },
-  methods: {
-  },
   computed: {
     ...mapGetters([
       'inspectedTile',
       'scenes',
     ]),
-  },
-  mounted() {
   },
 };
 </script>
@@ -62,6 +50,8 @@ export default {
   background-color: white;
   box-shadow: 2px 4px 8px #9c9c9c;
 
+  overflow-y: auto;
+
   transform: translateX(0);
   -webkit-transform: translateX(0);
   animation-fill-mode: forwards;
@@ -78,6 +68,10 @@ export default {
     position: relative;
     overflow-x: hidden;
   }
+}
+
+li {
+  margin-bottom: 5px;
 }
 
 </style>

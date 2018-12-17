@@ -6,7 +6,13 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 
 
-const download = function(url, dest, callback) {
+const download = function(url, dest, options, callback) {
+
+  if(options && options.skip && fs.existsSync(dest) && callback) {
+    callback(null, dest);
+    return;
+  }
+
   var file = fs.createWriteStream(dest);
 
   https.get(url, function(response) {

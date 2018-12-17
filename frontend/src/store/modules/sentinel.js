@@ -5,23 +5,29 @@ import {
   ADD_SELECTED_TILE,
   REMOVE_SELECTED_TILE,
   SET_INSPECTED_TILE,
+  SET_SENTINEL_GRID,
 } from '../mutations.type';
 
 import {
+  FETCH_SENTINEL_GRID,
   FETCH_SENTINEL_TILES,
   FETCH_SENTINEL_DATE_RANGE,
   FILTER_SENTINEL_SCENES,
   SELECT_TILE,
   UNSELECT_TILE,
+  SELECT_SCENE,
 } from '../actions.type';
 
+import geo from '@/services/geo';
 import sentinel from '@/services/sentinel';
 
 export default {
 
   state: {
     tiles: [],
+    sentinelGrid: {},
     selectedTiles: [],
+    selectedScenes: {},
     dateRange: {
       min: new Date(),
       max: new Date(),
@@ -33,10 +39,19 @@ export default {
 
   getters: {
     tiles: state => state.tiles,
+    sentinelGrid: state => state.sentinelGrid,
     selectedTiles: state => state.selectedTiles,
+    selectedScenes: state => state.selectedScenes,
+    selectedScene: state => state.selectedScenes[state.inspectedTile.id],
     dateRange: state => state.dateRange,
     scenes: state => state.scenes,
     inspectedTile: state => state.inspectedTile,
+    inspectedTileFeature: (state) => {
+      const gridFeature = state.sentinelGrid.features.filter(feature => feature.properties.TileID
+        === state.inspectedTile.id);
+      return gridFeature[0];
+    },
+    isFiltering: state => state.isFiltering,
   },
 
   mutations: {
@@ -70,6 +85,12 @@ export default {
     },
     [SET_INSPECTED_TILE](state, tile) {
       state.inspectedTile = tile;
+    },
+    [SELECT_SCENE](state, scene) {
+      state.selectedScenes[state.inspectedTile.id] = scene;
+    },
+    [SET_SENTINEL_GRID](state, grid) {
+      state.sentinelGrid = grid;
     },
   },
 
@@ -110,6 +131,14 @@ export default {
       } else {
         context.commit(SET_INSPECTED_TILE, null);
       }
+    },
+    [SELECT_SCENE](context, scene) {
+      context.commit(SELECT_SCENE, scene);
+    },
+    [FETCH_SENTINEL_GRID](context) {
+      geo.getGridSentinel().then((response) => {
+        context.commit(SET_SENTINEL_GRID, response.data);
+      });
     },
   },
 };

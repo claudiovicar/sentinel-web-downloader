@@ -1,6 +1,6 @@
 <template lang="pug">
 
-  div.float-box.col-sm-6.col-lg-3
+  div.float-box.col-sm-6.col-lg-3(v-if="isFiltering")
 
     div.container
 
@@ -48,8 +48,20 @@
               max="100")
 
       button.btn.btn-primary.float-right(@click="filter()")
-        octicon.mr-2(name="search")
+        icon.mr-2(name="search")
         span Buscar
+
+  div.float-box.col-sm-6.col-lg-3(v-else)
+
+    div.container
+
+      h3 {{scenes.length}}
+
+      div(v-for="(tileScenes, tileId) in scenes")
+        h6 {{tileId}}
+        ul
+          li(v-for="s in tileScenes") {{s._id}}
+
 
 </template>
 
@@ -57,9 +69,7 @@
 
 import Multiselect from 'vue-multiselect';
 import DatePicker from 'vue2-datepicker';
-import Octicon from 'vue-octicon/components/Octicon.vue';
-
-import 'vue-octicon/icons/search';
+import Icon from 'vue-awesome';
 
 import { mapGetters } from 'vuex';
 
@@ -73,7 +83,7 @@ export default {
   components: {
     Multiselect,
     DatePicker,
-    Octicon,
+    Icon,
   },
   data() {
     return {
@@ -89,7 +99,7 @@ export default {
         max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
       this.$store.dispatch(FILTER_SENTINEL_SCENES, {
-        selectedTiles: this.selectedTiles, dateRange: dateRange, cloudCover: this.cloudCover
+        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
       });
     },
     selectTile(tile) {
@@ -102,8 +112,10 @@ export default {
   computed: {
     ...mapGetters([
       'tiles',
+      'scenes',
       'selectedTiles',
       'dateRange',
+      'isFiltering',
     ]),
   },
   mounted() {

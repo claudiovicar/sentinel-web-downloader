@@ -1,10 +1,9 @@
 import L from 'leaflet';
 
-import geo from '@/services/geo';
-
 import { MAP_STYLES } from '@/config';
 
-import { SELECT_TILE, UNSELECT_TILE } from '@/store/actions.type';
+import { SELECT_TILE, UNSELECT_TILE, FETCH_SENTINEL_GRID } from '@/store/actions.type';
+import { ADD_SELECTED_TILE, REMOVE_SELECTED_TILE, SET_SENTINEL_GRID } from '@/store/mutations.type';
 
 const tileMap = {};
 
@@ -33,35 +32,24 @@ function onFeature(feature, layer) {
 
 export default {
   methods: {
-    loadGrid() {
-      geo.getGridSentinel().then((response) => {
-        this.grid = L.geoJSON(response.data, {
-          style: MAP_STYLES.grid.default,
-          onEachFeature: onFeature.bind(this),
-        });
-        this.grid.addTo(this.map);
-        this.map.fitBounds(this.grid.getBounds());
+    addGridToMap() {
+      this.grid = L.geoJSON(this.$store.getters.sentinelGrid, {
+        style: MAP_STYLES.grid.default,
+        onEachFeature: onFeature.bind(this),
       });
+      this.grid.addTo(this.map);
+      this.map.fitBounds(this.grid.getBounds());
     },
   },
-  // computed: {
-  //   ...mapGetters([
-  //     'selectedTiles',
-  //   ]),
-  // },
-  // watch: {
-  //   selectedTiles: (oldValue, newValue) => {
-  //     // eslint-disable-next-line
-  //     console.log(oldValue, newValue);
-  //   },
-  // },
   mounted() {
+    this.$store.dispatch(FETCH_SENTINEL_GRID);
     this.$store.subscribe((mutation) => {
-      // TODO: Usar constantes
-      if (mutation.type === 'selectTile') {
+      if (mutation.type === ADD_SELECTED_TILE) {
         tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.selected);
-      } else if (mutation.type === 'unselectTile') {
+      } else if (mutation.type === REMOVE_SELECTED_TILE) {
         tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.default);
+      } else if (mutation.type === SET_SENTINEL_GRID) {
+        this.addGridToMap();
       }
     });
   },
