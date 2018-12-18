@@ -1,6 +1,6 @@
 <template lang="pug">
 
-div.tile-preview(@click="selectScene(scene)")
+div.tile-preview(@click="selectScene(scene)", :class="{'selected': isSelected()}")
 
   div.info
     span Sentinel2
@@ -19,7 +19,7 @@ div.tile-preview(@click="selectScene(scene)")
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 import { SELECT_SCENE } from '@/store/actions.type';
 
@@ -51,6 +51,14 @@ export default {
     ...mapActions({
       selectScene: SELECT_SCENE,
     }),
+    ...mapGetters([
+      'selectedScenes',
+    ]),
+    isSelected() {
+      const selectedScene = this.selectedScenes()[this.scene.tile.id];
+      // eslint-disable-next-line
+      return selectedScene && this.scene._id === selectedScene._id;
+    },
   },
 };
 </script>
@@ -64,6 +72,12 @@ $size: 360px;
   width: $size;
   height: $size;
   background-color: #AAA;
+
+  &.selected {
+    .info {
+      background-color: #007bff;
+    }
+  }
 }
 
 .info {

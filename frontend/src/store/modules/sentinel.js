@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import {
   SET_TILES,
   SET_DATE_RANGE,
@@ -87,7 +89,7 @@ export default {
       state.inspectedTile = tile;
     },
     [SELECT_SCENE](state, scene) {
-      state.selectedScenes[state.inspectedTile.id] = scene;
+      Vue.set(state.selectedScenes, state.inspectedTile.id, scene);
     },
     [SET_SENTINEL_GRID](state, grid) {
       state.sentinelGrid = grid;

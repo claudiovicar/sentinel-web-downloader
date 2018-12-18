@@ -34,6 +34,10 @@ export default {
     width: 100%;
     height: 60px;
     background-color: white;
+    .float-right {
+      padding: 20px 35px;
+      color: grey;
+    }
   }
 
 </style>

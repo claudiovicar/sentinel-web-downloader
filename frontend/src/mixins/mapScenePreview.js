@@ -1,10 +1,7 @@
 import L from 'leaflet';
 
-import geo from '@/services/geo';
-
-import { MAP_STYLES } from '@/config';
-
 import { SELECT_SCENE } from '@/store/actions.type';
+import { mapGetters } from 'vuex';
 
 const sceneOverlayMap = {};
 
@@ -29,8 +26,13 @@ export default {
         const gridFeature = this.$store.getters.inspectedTileFeature;
         const fixedCoords = gridFeature.geometry.coordinates[0].map(c => [c[1], c[0]]);
         const bounds = L.latLngBounds(fixedCoords);
-        createImageOverlay(this.$store.getters.selectedScene, bounds, this.map);
+        createImageOverlay(this.selectedScene, bounds, this.map);
       }
     });
+  },
+  computed: {
+    ...mapGetters([
+      'selectedScene',
+    ]),
   },
 };
