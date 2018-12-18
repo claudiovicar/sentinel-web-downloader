@@ -55,9 +55,9 @@ export default {
       'selectedScenes',
     ]),
     isSelected() {
-      const selectedScene = this.selectedScenes()[this.scene.tile.id];
+      const scenes = this.selectedScenes()[this.scene.tile.id];
       // eslint-disable-next-line
-      return selectedScene && this.scene._id === selectedScene._id;
+      return scenes && scenes.filter(scene => this.scene._id === scene._id).length;
     },
   },
 };

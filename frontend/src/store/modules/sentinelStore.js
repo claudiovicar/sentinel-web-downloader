@@ -96,7 +96,16 @@ export default {
       Vue.set(state, 'inspectedTile', tile);
     },
     [SELECT_SCENE](state, scene) {
-      Vue.set(state.selectedScenes, state.inspectedTile.id, scene);
+      let scenes = state.selectedScenes[state.inspectedTile.id] || [];
+      // eslint-disable-next-line
+      const sceneIndex = scenes.findIndex(s => s._id === scene._id);
+      if (sceneIndex >= 0) {
+        scenes.splice(sceneIndex, 1);
+      } else {
+        scenes = [...scenes, scene];
+      }
+      // scenes.push(scene);
+      Vue.set(state.selectedScenes, state.inspectedTile.id, scenes);
     },
     [SET_SENTINEL_GRID](state, grid) {
       state.sentinelGrid = grid;

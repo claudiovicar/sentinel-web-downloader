@@ -150,10 +150,10 @@ function downloadPreviewTCI(scene) {
 
       return new Promise((resolve, reject) => {
 
-        exec(`gdal_translate -of JPEG -a_nodata 0 ${tempPreviewFile} ${destinationFile}`, function(err, stdout, stderr) {
+        exec(`gdal_translate -of PNG -a_nodata 0 ${tempPreviewFile} ${destinationFile}`, function(err, stdout, stderr) {
 
           if(err || stderr) {
-            console.log('Erro ao converter JP2 para JPEG ' + (err || stderr));
+            console.log('Erro ao converter JP2 para PNG ' + (err || stderr));
             reject();
           }
 

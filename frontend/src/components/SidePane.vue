@@ -83,8 +83,9 @@
           span.title {{tileId}}
           span.numScenes {{tileScenes.length}} cenas
           div(v-if="selectedScenes[tileId]")
-            small.float-left {{formattedDate(selectedScenes[tileId].sensing_time)}}
-            small.float-right {{selectedScenes[tileId].cloud_cover}}
+            div(v-for="scene in selectedScenes[tileId]")
+              small.float-left {{formattedDate(scene.sensing_time)}}
+              small.float-right {{scene.cloud_cover}}
           //- li.list-group-item(v-for="s in tileScenes") {{s._id}}
 
 
