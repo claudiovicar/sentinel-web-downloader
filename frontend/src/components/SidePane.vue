@@ -1,6 +1,6 @@
 <template lang="pug">
 
-  div.float-box.col-sm-6.col-lg-3(v-if="isFiltering")
+  div.float-box.col-sm-6.col-lg-3(v-if="isSearching")
 
     div
 
@@ -57,18 +57,21 @@
 
     div.col
 
-      //- h2 Cenas encontradas
-      small
-        div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
-          | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
-        div
-          | Data:
-          | {{formattedDate(scenesQuery.dateRange.min)}}
-          | -
-          | {{formattedDate(scenesQuery.dateRange.max)}}
-        div
-          | Percentual de nuvens: {{scenesQuery.cloudCover}}%
-      hr
+      div.row
+        div.query-details.col-sm-10
+          small
+            div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
+              | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+            div
+              | Data:
+              | {{formattedDate(scenesQuery.dateRange.min)}}
+              | -
+              | {{formattedDate(scenesQuery.dateRange.max)}}
+            div
+              | Percentual de nuvens: {{scenesQuery.cloudCover}}%
+
+        div.icon-return.col-sm-2(@click="backToSearch")
+          icon(name="arrow-left", scale="2")
 
     div.scenes-list
       ul.list-group
@@ -95,9 +98,11 @@ import Icon from 'vue-awesome';
 
 import { mapGetters } from 'vuex';
 
+import { VIEW_STATES } from '@/config';
+
 import {
   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
-  FILTER_SENTINEL_SCENES,
+  FILTER_SENTINEL_SCENES, SET_CURRENT_VIEW,
 } from '@/store/actions.type';
 
 export default {
@@ -133,6 +138,9 @@ export default {
     formattedDate(date) {
       return new Date(date).toLocaleDateString('pt-br');
     },
+    backToSearch() {
+      this.$store.dispatch(SET_CURRENT_VIEW, VIEW_STATES.SEARCH);
+    },
   },
   computed: {
     ...mapGetters([
@@ -141,9 +149,12 @@ export default {
       'selectedTiles',
       'selectedScenes',
       'dateRange',
-      'isFiltering',
+      'currentView',
       'scenesQuery',
     ]),
+    isSearching() {
+      return this.currentView === VIEW_STATES.SEARCH;
+    },
     // countScenes() {
     //   return Object.keys(this.scenes).length;
     // },
@@ -165,6 +176,21 @@ export default {
 .scenes-list {
   height: 80%;
   overflow-y: auto;
+}
+
+.query-details {
+  padding: 10px;
+}
+
+.icon-return {
+  cursor: pointer;
+  padding: 22px;
+  &:hover {
+    background-color: #EFEFEF;
+  }
+  .fa-icon {
+    color: $icon-color;
+  }
 }
 
 ul.list-group {

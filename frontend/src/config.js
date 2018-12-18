@@ -3,13 +3,15 @@ export default {};
 export const MAP_STYLES = {
   grid: {
     default: {
-      fill: 'white',
+      fill: '#6c757d',
       fillOpacity: 0.1,
-      color: 'white',
+      color: '#6c757d',
       weight: 1,
     },
     selected: {
-      color: '#ffc107',
+      // color: '#ffc107',
+      color: 'orange',
+      weight: 2,
       fill: 'white',
       fillOpacity: 0.01,
     },
@@ -21,4 +23,9 @@ export const MAP_STYLES = {
       weight: 1,
     },
   },
+};
+
+export const VIEW_STATES = {
+  SEARCH: 'SEARCH',
+  SCENE_SELECTION: 'SCENE_SELECTION',
 };

@@ -19,10 +19,12 @@ import {
   SELECT_TILE,
   UNSELECT_TILE,
   SELECT_SCENE,
+  SET_CURRENT_VIEW,
 } from '../actions.type';
 
 import geo from '@/services/geo';
 import sentinel from '@/services/sentinel';
+import { VIEW_STATES } from '@/config';
 
 export default {
 
@@ -37,8 +39,8 @@ export default {
       max: new Date(),
     },
     foundScenes: null,
-    isFiltering: true,
     inspectedTile: null,
+    currentView: VIEW_STATES.SEARCH,
   },
 
   getters: {
@@ -55,10 +57,13 @@ export default {
         === state.inspectedTile.id);
       return gridFeature[0];
     },
-    isFiltering: state => state.isFiltering,
+    currentView: state => state.currentView,
   },
 
   mutations: {
+    [SET_CURRENT_VIEW](state, currentView) {
+      Vue.set(state, 'currentView', currentView);
+    },
     [SET_TILES](state, tiles) {
       state.tiles = tiles;
     },
@@ -85,8 +90,7 @@ export default {
         groupedScenes[scene.tile.id].push(scene);
       });
       state.foundScenes = groupedScenes;
-      Vue.set(state, 'isFiltering', false);
-      // state.isFiltering = false;
+      Vue.set(state, 'currentView', VIEW_STATES.SCENE_SELECTION);
     },
     [SET_INSPECTED_TILE](state, tile) {
       Vue.set(state, 'inspectedTile', tile);
@@ -120,21 +124,22 @@ export default {
     [FILTER_SENTINEL_SCENES](context, { selectedTiles, dateRange, cloudCover }) {
       context.commit(SET_SCENES_QUERY, { selectedTiles, dateRange, cloudCover });
       sentinel.filterScenes(selectedTiles, dateRange, cloudCover).then(({ data }) => {
-        context.state.selectedTiles.forEach((tile) => {
+        const tilesToRemove = [...context.state.selectedTiles];
+        tilesToRemove.forEach((tile) => {
           context.commit(UNSELECT_TILE, tile);
         });
         context.commit(SET_SCENES, data);
       });
     },
     [SELECT_TILE](context, tile) {
-      if (context.state.isFiltering) {
+      if (context.state.currentView === VIEW_STATES.SEARCH) {
         context.commit(ADD_SELECTED_TILE, tile);
       } else {
         context.commit(SET_INSPECTED_TILE, tile);
       }
     },
     [UNSELECT_TILE](context, tile) {
-      if (context.state.isFiltering) {
+      if (context.state.currentView === VIEW_STATES.SEARCH) {
         context.commit(REMOVE_SELECTED_TILE, tile);
       } else {
         context.commit(SET_INSPECTED_TILE, null);
@@ -147,6 +152,9 @@ export default {
       geo.getGridSentinel().then((response) => {
         context.commit(SET_SENTINEL_GRID, response.data);
       });
+    },
+    [SET_CURRENT_VIEW](context, viewState) {
+      context.commit(SET_CURRENT_VIEW, viewState);
     },
   },
 };
