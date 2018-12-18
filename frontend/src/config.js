@@ -3,21 +3,22 @@ export default {};
 export const MAP_STYLES = {
   grid: {
     default: {
-      fill: 'grey',
+      fill: 'white',
       fillOpacity: 0.1,
-      color: 'grey',
+      color: 'white',
       weight: 1,
     },
     selected: {
-      color: 'orange',
-      fill: 'orange',
-      fillOpacity: 0.6,
+      color: '#ffc107',
+      fill: 'white',
+      fillOpacity: 0.01,
     },
   },
   brasil: {
     default: {
       fill: false,
-      color: 'steelblue',
+      color: 'black',
+      weight: 1,
     },
   },
 };

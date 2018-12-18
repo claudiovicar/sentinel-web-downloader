@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import sentinel from './modules/sentinel';
+import sentinel from './modules/sentinelStore';
 
 Vue.use(Vuex);
 

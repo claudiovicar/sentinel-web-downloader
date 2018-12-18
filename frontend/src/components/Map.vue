@@ -31,7 +31,7 @@ export default {
 
   mixins: [
     mapGrid, /** Mixin que gerencia o grid no mapa */
-    mapScenePreview,  /** Mixin que gerencia os previews de cenas no mapa */
+    mapScenePreview, /** Mixin que gerencia os previews de cenas no mapa */
   ],
 
   methods: {
@@ -39,12 +39,12 @@ export default {
     createMap() {
       this.map = L.map('map', MAP_CONFIG);
 
-      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       });
 
-      this.map.addLayer(osm);
+      this.map.addLayer(baseLayer);
 
       // this.loadUFs().then(this.loadGrid);
       this.loadUFs();

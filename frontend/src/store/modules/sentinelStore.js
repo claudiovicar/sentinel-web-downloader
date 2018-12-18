@@ -8,6 +8,7 @@ import {
   REMOVE_SELECTED_TILE,
   SET_INSPECTED_TILE,
   SET_SENTINEL_GRID,
+  SET_SCENES_QUERY,
 } from '../mutations.type';
 
 import {
@@ -30,11 +31,12 @@ export default {
     sentinelGrid: {},
     selectedTiles: [],
     selectedScenes: {},
+    scenesQuery: {},
     dateRange: {
       min: new Date(),
       max: new Date(),
     },
-    scenes: null,
+    foundScenes: null,
     isFiltering: true,
     inspectedTile: null,
   },
@@ -44,9 +46,9 @@ export default {
     sentinelGrid: state => state.sentinelGrid,
     selectedTiles: state => state.selectedTiles,
     selectedScenes: state => state.selectedScenes,
-    selectedScene: state => state.selectedScenes[state.inspectedTile.id],
+    scenesQuery: state => state.scenesQuery,
     dateRange: state => state.dateRange,
-    scenes: state => state.scenes,
+    foundScenes: state => state.foundScenes,
     inspectedTile: state => state.inspectedTile,
     inspectedTileFeature: (state) => {
       const gridFeature = state.sentinelGrid.features.filter(feature => feature.properties.TileID
@@ -82,17 +84,21 @@ export default {
         if (!groupedScenes[scene.tile.id]) groupedScenes[scene.tile.id] = [];
         groupedScenes[scene.tile.id].push(scene);
       });
-      state.scenes = groupedScenes;
-      state.isFiltering = false;
+      state.foundScenes = groupedScenes;
+      Vue.set(state, 'isFiltering', false);
+      // state.isFiltering = false;
     },
     [SET_INSPECTED_TILE](state, tile) {
-      state.inspectedTile = tile;
+      Vue.set(state, 'inspectedTile', tile);
     },
     [SELECT_SCENE](state, scene) {
       Vue.set(state.selectedScenes, state.inspectedTile.id, scene);
     },
     [SET_SENTINEL_GRID](state, grid) {
       state.sentinelGrid = grid;
+    },
+    [SET_SCENES_QUERY](state, query) {
+      state.scenesQuery = query;
     },
   },
 
@@ -112,12 +118,12 @@ export default {
       });
     },
     [FILTER_SENTINEL_SCENES](context, { selectedTiles, dateRange, cloudCover }) {
+      context.commit(SET_SCENES_QUERY, { selectedTiles, dateRange, cloudCover });
       sentinel.filterScenes(selectedTiles, dateRange, cloudCover).then(({ data }) => {
-        context.commit(SET_SCENES, data);
-
         context.state.selectedTiles.forEach((tile) => {
           context.commit(UNSELECT_TILE, tile);
         });
+        context.commit(SET_SCENES, data);
       });
     },
     [SELECT_TILE](context, tile) {

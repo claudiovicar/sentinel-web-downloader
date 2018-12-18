@@ -7,17 +7,31 @@ import { ADD_SELECTED_TILE, REMOVE_SELECTED_TILE, SET_SENTINEL_GRID } from '@/st
 
 const tileMap = {};
 
-function gridClicked(event) {
-  const layer = event.sourceTarget;
-  layer.selected = !layer.selected;
-  let action = null;
-  if (layer.selected) {
+function setLayerSelection(layer, selected) {
+  if (selected === true) {
     layer.setStyle(MAP_STYLES.grid.selected);
-    action = SELECT_TILE;
   } else {
     layer.setStyle(MAP_STYLES.grid.default);
-    action = UNSELECT_TILE;
   }
+
+  layer.selected = selected;
+}
+
+function gridClicked(event) {
+  const layer = event.sourceTarget;
+  // layer.selected = !layer.selected;
+
+  setLayerSelection(layer, !layer.selected);
+
+  const action = layer.selected ? SELECT_TILE : UNSELECT_TILE;
+
+  // if (layer.selected) {
+  //   // layer.setStyle(MAP_STYLES.grid.selected);
+  //   action = SELECT_TILE;
+  // } else {
+  //   // layer.setStyle(MAP_STYLES.grid.default);
+  //   action = UNSELECT_TILE;
+  // }
   this.$store.dispatch(action, { id: layer.feature.properties.TileID });
 }
 
@@ -45,9 +59,11 @@ export default {
     this.$store.dispatch(FETCH_SENTINEL_GRID);
     this.$store.subscribe((mutation) => {
       if (mutation.type === ADD_SELECTED_TILE) {
-        tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.selected);
+        setLayerSelection(tileMap[mutation.payload.id], true);
+        // tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.selected);
       } else if (mutation.type === REMOVE_SELECTED_TILE) {
-        tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.default);
+        setLayerSelection(tileMap[mutation.payload.id], false);
+        // tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.default);
       } else if (mutation.type === SET_SENTINEL_GRID) {
         this.addGridToMap();
       }

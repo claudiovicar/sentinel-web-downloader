@@ -2,7 +2,9 @@
 
   div.float-box.col-sm-6.col-lg-3(v-if="isFiltering")
 
-    div.container
+    div
+
+      h4 Buscar cenas
 
       form
 
@@ -51,16 +53,36 @@
         icon.mr-2(name="search")
         span Buscar
 
-  div.float-box.col-sm-6.col-lg-3(v-else)
+  div.float-box.no-padding.col-sm-6.col-lg-3(v-else)
 
-    div.container
+    div.col
 
-      h3 {{scenes.length}}
+      //- h2 Cenas encontradas
+      small
+        div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
+          | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+        div
+          | Data:
+          | {{formattedDate(scenesQuery.dateRange.min)}}
+          | -
+          | {{formattedDate(scenesQuery.dateRange.max)}}
+        div
+          | Percentual de nuvens: {{scenesQuery.cloudCover}}%
+      hr
 
-      div(v-for="(tileScenes, tileId) in scenes")
-        h6 {{tileId}}
-        ul
-          li(v-for="s in tileScenes") {{s._id}}
+    div.scenes-list
+      ul.list-group
+        li.list-group-item(
+          v-for="(tileScenes, tileId) in foundScenes",
+          @click="selectTile({id: tileId})"
+        )
+          icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
+          span.title {{tileId}}
+          span.numScenes {{tileScenes.length}} cenas
+          div(v-if="selectedScenes[tileId]")
+            small.float-left {{formattedDate(selectedScenes[tileId].sensing_time)}}
+            small.float-right {{selectedScenes[tileId].cloud_cover}}
+          //- li.list-group-item(v-for="s in tileScenes") {{s._id}}
 
 
 </template>
@@ -108,15 +130,23 @@ export default {
     unselectTile(tile) {
       this.$store.dispatch(UNSELECT_TILE, tile);
     },
+    formattedDate(date) {
+      return new Date(date).toLocaleDateString('pt-br');
+    },
   },
   computed: {
     ...mapGetters([
       'tiles',
-      'scenes',
+      'foundScenes',
       'selectedTiles',
+      'selectedScenes',
       'dateRange',
       'isFiltering',
+      'scenesQuery',
     ]),
+    // countScenes() {
+    //   return Object.keys(this.scenes).length;
+    // },
   },
   mounted() {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
@@ -126,37 +156,49 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
 
 #tile-date-picker {
   width: 100%;
 }
 
-.float-box {
-  z-index: 10000;
-  position: absolute;
-  top: 60px;
-  bottom: 0;
-
-  width: 600px;
-  background-color: white;
-  box-shadow: 2px 4px 8px #9c9c9c;
-
-  transform: translateX(0);
-  -webkit-transform: translateX(0);
-  animation-fill-mode: forwards;
-  transition-property: -webkit-transform,transform,opacity;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.0,0.0,0.2,1);
-
-  .float-box-view {
-    background-color: #FFF;
-    width: 100%;
-    height: 100%;
-    background-color: #FFF;
-    display: block;
-    position: relative;
-    overflow-x: hidden;
-  }
+.scenes-list {
+  height: 80%;
+  overflow-y: auto;
 }
+
+ul.list-group {
+
+  li.list-group-item {
+    cursor: pointer;
+    border-radius: 0;
+    &:hover {
+      background-color: #EFEFEF;
+    }
+    .title {
+      font-weight: bold;
+    }
+    .numScenes {
+      float: right;
+      font-size: 12px;
+      color: $secondary;
+    }
+    .fa-icon {
+      margin-right: 4px;
+      color: $success;
+    }
+  }
+
+}
+
+// ul.scenes-list {
+
+//   width: 100%;
+
+//   li {
+//     padding: 10px 15px;
+//   }
+
+// }
 
 </style>
