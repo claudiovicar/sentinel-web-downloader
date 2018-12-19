@@ -25,4 +25,12 @@ export default {
     return axios.post(fullURL('/scenes/filter'), params);
   },
 
+  getPreview(sceneId) {
+    return axios.get(`/sentinel/scenes/${sceneId}/preview`);
+  },
+
+  generateComposition(scenes) {
+    return axios.post(fullURL('/scenes/generateComposition'), { scenes });
+  },
+
 };

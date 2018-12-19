@@ -51,4 +51,18 @@ router.get('/:id/preview', (req, res) => {
 
 });
 
+router.post('/generateComposition', (req, res) => {
+
+  if (!req.body.scenes) res.sendStatus(500);
+
+  tileDownloader.downloadBands(req.body.scenes)
+  .then(() => {
+    res.sendStatus(200);
+  })
+  .catch((e) => {
+    res.sendStatus(500);
+  });
+
+});
+
 module.exports = router;

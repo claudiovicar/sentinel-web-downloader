@@ -1,3 +1,8 @@
+/**
+ * Class for downloading and parsing the .CSV file with scene info from GoogleCloud
+ *
+ */
+
 const {promisify} = require('util');
 const fileUtils = require('./fileUtils');
 const asyncGunzip = promisify(require('gunzip-file'));
@@ -104,9 +109,7 @@ function fillTileIds() {
 
     tileIDs.push(feature.properties.TileID);
 
-    let sentinelTile = new SentinelTile({id: feature.properties.TileID});
-
-    sentinelTile.save();
+    new SentinelTile({id: feature.properties.TileID}).save();
 
   });
 

@@ -4,7 +4,7 @@
 
     div.container
 
-      h2 {{inspectedTile.id}} - {{foundScenes[inspectedTile.id].length}} cenas
+      h2.mb-4 {{inspectedTile.id}} - {{foundScenes[inspectedTile.id].length}} cenas
 
       ul.d-flex.justify-content-center.flex-wrap
         li(v-for="scene in foundScenes[inspectedTile.id]")
@@ -42,6 +42,8 @@ export default {
 .float-box {
   right: 0;
   overflow-y: auto;
+  background-color: #f3f3f3;
+  padding: 15px;
 }
 
 li {

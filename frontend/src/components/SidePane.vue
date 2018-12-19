@@ -83,10 +83,14 @@
           span.title {{tileId}}
           span.numScenes {{tileScenes.length}} cenas
           div(v-if="selectedScenes[tileId]")
-            div(v-for="scene in selectedScenes[tileId]")
+            div.clearfix(v-for="scene in selectedScenes[tileId]")
               small.float-left {{formattedDate(scene.sensing_time)}}
               small.float-right {{scene.cloud_cover}}
-          //- li.list-group-item(v-for="s in tileScenes") {{s._id}}
+
+      div.col
+        button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()", v-if="hasSelectedScenes")
+          icon.mr-2(name="file-download")
+          span Baixar cenas
 
 
 </template>
@@ -105,6 +109,8 @@ import {
   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
   FILTER_SENTINEL_SCENES, SET_CURRENT_VIEW,
 } from '@/store/actions.type';
+
+import sentinel from '@/services/sentinel';
 
 export default {
   name: 'SidePane',
@@ -139,6 +145,19 @@ export default {
     formattedDate(date) {
       return new Date(date).toLocaleDateString('pt-br');
     },
+    downloadScenes() {
+      let scenes = [];
+      for(let tileId in this.selectedScenes) {
+        scenes = scenes.concat(this.selectedScenes[tileId]);
+      }
+      sentinel.generateComposition(scenes)
+        .then((response) => {
+          window.alert('Download em andamento');
+        })
+        .catch((error) => {
+          window.alert('Erro no download');
+        });
+    },
     backToSearch() {
       this.$store.dispatch(SET_CURRENT_VIEW, VIEW_STATES.SEARCH);
     },
@@ -155,6 +174,12 @@ export default {
     ]),
     isSearching() {
       return this.currentView === VIEW_STATES.SEARCH;
+    },
+    hasSelectedScenes() {
+      for (let tileId in this.foundScenes) {
+        if (this.selectedScenes[tileId]) return true;
+      }
+      return false;
     },
     // countScenes() {
     //   return Object.keys(this.scenes).length;
