@@ -3,6 +3,7 @@ var router = require('express').Router();
 const tileDownloader = require('../../utils/sentinelTileDownloader');
 
 const SentinelScene = require('../../models/SentinelScene');
+const SentinelDownloadRequest = require('../../models/SentinelDownloadRequest');
 
 router.param('id', function(req, res, next, id) {
   SentinelScene.findById(id).populate('tile').exec()
@@ -58,6 +59,21 @@ router.post('/generateComposition', (req, res) => {
   tileDownloader.downloadBands(req.body.scenes)
   .then(() => {
     res.sendStatus(200);
+  })
+  .catch((e) => {
+    res.sendStatus(500);
+  });
+
+});
+
+router.get('/downloadStatus', (req, res) => {
+
+  SentinelDownloadRequest.find({})
+  .populate({
+    path: 'scene',
+  select: 'granule_id cloud_cover -_id'})
+  .then((requests) => {
+    res.send(requests);
   })
   .catch((e) => {
     res.sendStatus(500);

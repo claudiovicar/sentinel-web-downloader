@@ -33,4 +33,8 @@ export default {
     return axios.post(fullURL('/scenes/generateComposition'), { scenes });
   },
 
+  getDownloadStatus() {
+    return axios.get(fullURL('/scenes/downloadStatus'));
+  },
+
 };
