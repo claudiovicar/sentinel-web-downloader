@@ -4,6 +4,8 @@
         h2
             | Acompanhe o andamento dos downloads
 
+        label(@click="navigateBack()") Voltar
+
         div.row.request-list(v-if="requests")
             ul.list-group.col
                 ul.list-group-item(v-for="request in requests")
@@ -15,24 +17,29 @@
 
 <script>
 import sentinel from '@/services/sentinel';
+
 export default {
-    data() {
-        return {
-            requests: null
-        };
+  data() {
+    return {
+      requests: null,
+    };
+  },
+  methods: {
+    navigateBack() {
+      this.$router.push({ name: 'home' });
     },
-    methods: {
-        update() {
-            sentinel.getDownloadStatus()
-                .then((response) => {
-                    this.requests = response.data;
-                })
-                .catch(e => console.log);
-        },
+    update() {
+      sentinel.getDownloadStatus()
+        .then((response) => {
+          this.requests = response.data;
+        })
+        // eslint-disable-next-line
+        .catch(e => console.log(e));
     },
-    mounted() {
-        this.update();
-    },
+  },
+  mounted() {
+    this.update();
+  },
 };
 </script>
 

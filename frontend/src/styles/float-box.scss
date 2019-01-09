@@ -1,8 +1,12 @@
+@import 'variables.scss';
+
 .float-box {
+
   z-index: 10000;
   position: absolute !important;
-  top: 60px;
+  top: $header-height;
   bottom: 0;
+  padding: 15px;
 
   // width: 600px;
   background-color: white;

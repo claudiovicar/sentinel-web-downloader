@@ -87,8 +87,27 @@
               small.float-left {{formattedDate(scene.sensing_time)}}
               small.float-right {{scene.cloud_cover}}
 
-      div.col
-        button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()", v-if="hasSelectedScenes")
+      div.col(v-if="hasSelectedScenes")
+
+        hr
+
+        .form-group
+          label(for="scenes-band-composition") Composição de bandas:
+          div
+            input.form-control(
+              id="scenes-band-composition",
+              type="text",
+              v-model="outputBandComposition")
+
+        .form-group
+          label(for="scenes-output-format") Formato de saída:
+          div
+            select.form-control(
+              id="scenes-band-composition",
+              v-model="outputFileFormat")
+              option(v-for="format in outputFormats", :value="format") {{format}}
+
+        button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
           icon.mr-2(name="file-download")
           span Baixar cenas
 
@@ -124,6 +143,9 @@ export default {
       expanded: false,
       selectedDates: [],
       cloudCover: 5,
+      outputBandComposition: '4,3,2',
+      outputFormats: ['img', 'tiff'],
+      outputFileFormat: 'img',
     };
   },
   methods: {
@@ -147,14 +169,21 @@ export default {
     },
     downloadScenes() {
       let scenes = [];
-      for(let tileId in this.selectedScenes) {
+      Object.keys(this.selectedScenes).forEach((tileId) => {
         scenes = scenes.concat(this.selectedScenes[tileId]);
-      }
-      sentinel.generateComposition(scenes)
+      });
+      const bandArray = this.outputBandComposition.split(',');
+      sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
         .then((response) => {
+          // eslint-disable-next-line
+          console.log(response);
+          // eslint-disable-next-line
           window.alert('Download em andamento');
         })
         .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+          // eslint-disable-next-line
           window.alert('Erro no download');
         });
     },
@@ -176,10 +205,10 @@ export default {
       return this.currentView === VIEW_STATES.SEARCH;
     },
     hasSelectedScenes() {
-      for (let tileId in this.foundScenes) {
+      return Object.keys(this.foundScenes).some((tileId) => {
         if (this.selectedScenes[tileId]) return true;
-      }
-      return false;
+        return false;
+      });
     },
     // countScenes() {
     //   return Object.keys(this.scenes).length;
@@ -188,12 +217,17 @@ export default {
   mounted() {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
+    [this.outputFileFormat] = this.outputFormats;
   },
 };
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
+
+.float-box {
+  background-color: #f3f3f3;
+}
 
 #tile-date-picker {
   width: 100%;

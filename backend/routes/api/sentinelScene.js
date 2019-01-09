@@ -56,7 +56,7 @@ router.post('/generateComposition', (req, res) => {
 
   if (!req.body.scenes) res.sendStatus(500);
 
-  tileDownloader.downloadBands(req.body.scenes)
+  tileDownloader.downloadBands(req.body.scenes, req.body.outputFormat, req.body.bandComposition)
   .then(() => {
     res.sendStatus(200);
   })

@@ -14,12 +14,18 @@ const COMPOSITION_IMG_NAME = 'COMPOSITION_';
 const PREVIEW_IMG_NAME = 'preview.jpg';
 const PREVIEW_TMP_IMG_NAME = 'preview.jp2';
 
-async function downloadBands(scenes, composition = [4,3,2]) {
+// Maps human-readable extensions to GDAL's format names
+const GDAL_OUTPUT_FORMATS = {
+  'img': 'HFA',
+  'tiff': 'GTIFF'
+};
+
+async function downloadBands(scenes, outputFormat = 'img', bandComposition = [4,3,2]) {
 
   for (let index = 0; index < scenes.length; index++) {
     const scene = await SentinelScene.findById(scenes[index]._id).populate('tile').exec();
 
-    new SentinelDownloadRequest({bands: composition, scene}).save();
+    new SentinelDownloadRequest({bands: bandComposition, outputFormat, scene}).save();
 
   }
 
@@ -52,7 +58,8 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
   downloadRequest.status = 'IN_PROGRESS';
   await downloadRequest.save();
 
-  const destinationFile = path.join(sentinelUtils.getDestinationFolder(downloadRequest.scene), COMPOSITION_IMG_NAME + bands.toString().split(',').join('_') + '.img');
+  const destinationFile = path.join(sentinelUtils.getDestinationFolder(downloadRequest.scene),
+    COMPOSITION_IMG_NAME + downloadRequest.bands.toString().split(',').join('_') + '.' + downloadRequest.outputFormat);
 
   if (fs.existsSync(destinationFile)) {
     downloadRequest.status = 'DONE';
@@ -71,7 +78,8 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
 
   return Promise.all(bandPromises)
     .then(() => {
-      let comandoGDAL = `gdal_merge.py -separate -of HFA -o ${destinationFile} `;
+      const outputFormat = GDAL_OUTPUT_FORMATS[downloadRequest.outputFormat];
+      let comandoGDAL = `gdal_merge.py -separate -of ${outputFormat} -o ${destinationFile} `;
       downloadedBandPaths.forEach((bandPath) => {
         comandoGDAL += bandPath + ' ';
       });

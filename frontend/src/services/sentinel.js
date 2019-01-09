@@ -29,8 +29,8 @@ export default {
     return axios.get(`/sentinel/scenes/${sceneId}/preview`);
   },
 
-  generateComposition(scenes) {
-    return axios.post(fullURL('/scenes/generateComposition'), { scenes });
+  generateComposition(scenes, bandComposition, outputFormat) {
+    return axios.post(fullURL('/scenes/generateComposition'), { scenes, outputFormat, bandComposition });
   },
 
   getDownloadStatus() {
