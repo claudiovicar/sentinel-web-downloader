@@ -12,7 +12,9 @@
                     div {{request.scene.granule_id}}
                     div {{request.bands}}
                     //- div {{request.status}}
-                    div.badge.badge-success(v-if="request.status === 'DONE'") Completo
+                    div(v-if="request.status === 'DONE'")
+                      div.badge.badge-success Completo
+                      button.btn.btn-link(@click="download(request)") Download
 </template>
 
 <script>
@@ -36,6 +38,9 @@ export default {
         // eslint-disable-next-line
         .catch(e => console.log(e));
     },
+    download(request) {
+      sentinel.downloadScene(request);
+    },
   },
   mounted() {
     this.update();
@@ -46,12 +51,12 @@ export default {
 <style lang="scss" scoped>
 
 .container {
-    height: 100%;
+  height: 100%;
 }
 
 .request-list {
-    height: 100%;
-    overflow-y: auto;
+  height: 100%;
+  overflow-y: auto;
 }
 
 </style>

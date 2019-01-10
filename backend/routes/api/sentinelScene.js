@@ -1,5 +1,6 @@
 var router = require('express').Router();
 
+const sentinelUtils = require('../../utils/sentinelUtils');
 const tileDownloader = require('../../utils/sentinelTileDownloader');
 
 const SentinelScene = require('../../models/SentinelScene');
@@ -11,6 +12,22 @@ router.param('id', function(req, res, next, id) {
       if (!scene) { return res.sendStatus(404); }
 
       req.scene = scene;
+
+      return next();
+    }).catch(next);
+});
+
+router.param('downloadRequestId', function(req, res, next, id) {
+  SentinelDownloadRequest.findById(id).populate({
+    path: 'scene',
+    populate: {
+      path: 'tile'
+    }
+  }).exec()
+    .then(function (downloadRequest) {
+      if (!downloadRequest) { return res.sendStatus(404); }
+
+      req.downloadRequest = downloadRequest;
 
       return next();
     }).catch(next);
@@ -71,13 +88,26 @@ router.get('/downloadStatus', (req, res) => {
   SentinelDownloadRequest.find({})
   .populate({
     path: 'scene',
-  select: 'granule_id cloud_cover -_id'})
+    select: 'granule_id cloud_cover -_id'})
   .then((requests) => {
     res.send(requests);
   })
   .catch((e) => {
     res.sendStatus(500);
   });
+
+});
+
+router.get('/download/:downloadRequestId', (req, res) => {
+
+  if (!req.downloadRequest) res.sendStatus(500);
+
+  const destinationFile = sentinelUtils.getSentinelRequestDestinationFolder(req.downloadRequest);
+  const fileName = req.downloadRequest.scene.granule_id + '_' +
+    req.downloadRequest.bands.toString().split(',').join('_') +
+    '.' + req.downloadRequest.outputFormat;
+
+  res.download(destinationFile, fileName);
 
 });
 

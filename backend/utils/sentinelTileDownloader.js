@@ -10,7 +10,6 @@ const path = require('path');
 const exec = require('child_process').exec;
 
 const BAND_IMG_NAME = 'BANDA_';
-const COMPOSITION_IMG_NAME = 'COMPOSITION_';
 const PREVIEW_IMG_NAME = 'preview.jpg';
 const PREVIEW_TMP_IMG_NAME = 'preview.jp2';
 
@@ -58,8 +57,7 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
   downloadRequest.status = 'IN_PROGRESS';
   await downloadRequest.save();
 
-  const destinationFile = path.join(sentinelUtils.getDestinationFolder(downloadRequest.scene),
-    COMPOSITION_IMG_NAME + downloadRequest.bands.toString().split(',').join('_') + '.' + downloadRequest.outputFormat);
+  const destinationFile = sentinelUtils.getSentinelRequestDestinationFolder(downloadRequest);
 
   if (fs.existsSync(destinationFile)) {
     downloadRequest.status = 'DONE';

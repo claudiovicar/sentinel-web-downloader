@@ -20,7 +20,8 @@ var SentinelSceneSchema = new mongoose.Schema({
 SentinelSceneSchema.index({sensing_time: 1});
 
 /**
- * Sample granule_id: L1C_T18MXB_A017711_20181112T151659, or S2A_OPER_MSI_L1C_TL_SGS__20151217T194403_A002538_T20KQU_N02.01
+ * Sample granule_id: L1C_T18MXB_A017711_20181112T151659, or
+   S2A_OPER_MSI_L1C_TL_SGS__20151217T194403_A002538_T20KQU_N02.01
  */
 SentinelSceneSchema.methods.getSceneInfo = function() {
 

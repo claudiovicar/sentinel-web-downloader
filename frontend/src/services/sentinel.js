@@ -37,4 +37,9 @@ export default {
     return axios.get(fullURL('/scenes/downloadStatus'));
   },
 
+  downloadScene(request) {
+    // eslint-disable-next-line
+    window.location.href = fullURL(`/scenes/download/${request._id}`);
+  },
+
 };
