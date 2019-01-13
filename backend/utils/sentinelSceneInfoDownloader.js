@@ -1,3 +1,8 @@
+/**
+ * Class for downloading and parsing the .CSV file with scene info from GoogleCloud
+ *
+ */
+
 const {promisify} = require('util');
 const fileUtils = require('./fileUtils');
 const asyncGunzip = promisify(require('gunzip-file'));
@@ -7,8 +12,11 @@ const fs = require('fs');
 const SentinelScene = require('../models/SentinelScene');
 const SentinelTile = require('../models/SentinelTile');
 
-const SENTINEL2_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-sentinel-2/index.csv.gz';
+const SENTINEL2_METADATA_URL = process.env.SENTINEL2_METADATA_URL;
+// const SENTINEL2_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-sentinel-2/index.csv.gz';
 // const SENTINEL2_METADATA_URL = 'http://ufpr.dl.sourceforge.net/project/od1n/samples.tar.gz';
+
+// https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles/18/M/ZD/2018/11/12/0/preview.jpg
 
 const csvHeaders = ['granule_id', 'product_id', 'datatake_identifier', 'tile_id', 'sensing_time', 'total_size', 'cloud_cover',
 'geometric_quality_flag', 'generation_time', 'north_lat', 'south_lat', 'west_lon', 'east_lon', 'base_url'];
@@ -101,9 +109,7 @@ function fillTileIds() {
 
     tileIDs.push(feature.properties.TileID);
 
-    let sentinelTile = new SentinelTile({id: feature.properties.TileID});
-
-    sentinelTile.save();
+    new SentinelTile({id: feature.properties.TileID}).save();
 
   });
 

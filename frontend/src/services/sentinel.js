@@ -13,7 +13,33 @@ export default {
   },
 
   dateRange() {
-    return axios.get(fullURL('/dateRange'));
+    return axios.get(fullURL('/scenes/dateRange'));
+  },
+
+  filterScenes(tiles, dateRange, cloudCover) {
+    const params = {
+      tiles,
+      dateRange,
+      cloudCover,
+    };
+    return axios.post(fullURL('/scenes/filter'), params);
+  },
+
+  getPreview(sceneId) {
+    return axios.get(`/sentinel/scenes/${sceneId}/preview`);
+  },
+
+  generateComposition(scenes, bandComposition, outputFormat) {
+    return axios.post(fullURL('/scenes/generateComposition'), { scenes, outputFormat, bandComposition });
+  },
+
+  getDownloadStatus() {
+    return axios.get(fullURL('/scenes/downloadStatus'));
+  },
+
+  downloadScene(request) {
+    // eslint-disable-next-line
+    window.location.href = fullURL(`/scenes/download/${request._id}`);
   },
 
 };

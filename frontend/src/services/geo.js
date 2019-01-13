@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.VUE_APP_HTTP_PATH + 'geo';
+const BASE_URL = `${process.env.VUE_APP_HTTP_PATH}geo`;
 
 function fullURL(path) {
   return BASE_URL + path;

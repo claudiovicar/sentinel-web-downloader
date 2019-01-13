@@ -5,6 +5,7 @@ router.get('/', (req, res) => {
 });
 
 router.use('/geo', require('./api/geo'));
-router.use('/sentinel', require('./api/sentinel'));
+router.use('/sentinel/tiles', require('./api/sentinelTile'));
+router.use('/sentinel/scenes', require('./api/sentinelScene'));
 
 module.exports = router;

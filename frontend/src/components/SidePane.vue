@@ -1,8 +1,10 @@
 <template lang="pug">
 
-  div.float-box.col-sm-6.col-lg-3
+  div.float-box.col-sm-6.col-lg-3(v-if="isSearching")
 
-    div.container
+    div
+
+      h4 Buscar cenas
 
       form
 
@@ -10,7 +12,7 @@
           label(for="tile-picker") Selecione os tiles:
           multiselect(
             id="tile-picker",
-            v-model="selectedTiles",
+            :value="selectedTiles",
             :options="tiles",
             :multiple="true",
             :close-on-select="false",
@@ -19,7 +21,9 @@
             placeholder="Selecione..."
             label="id",
             track-by="id",
-            :preselect-first="false"
+            :preselect-first="false",
+            @select="selectTile",
+            @remove="unselectTile"
           )
             template(slot="option", slot-scope="props", @click="mouseover")
               .option__desc
@@ -31,8 +35,8 @@
             id="tile-date-picker",
             v-model='selectedDates',
             lang='pt-br',
-            :not-before="dates.min",
-            :not-after="dates.max",
+            :not-before="dateRange.min",
+            :not-after="dateRange.max",
             range)
 
         .form-group
@@ -45,10 +49,68 @@
               min="0",
               max="100")
 
+      button.btn.btn-primary.float-right(@click="filter()")
+        icon.mr-2(name="search")
+        span Buscar
+
+  div.float-box.no-padding.col-sm-6.col-lg-3(v-else)
+
+    div.col
+
+      div.row
+        div.query-details.col-sm-10
+          small
+            div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
+              | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+            div
+              | Data:
+              | {{formattedDate(scenesQuery.dateRange.min)}}
+              | -
+              | {{formattedDate(scenesQuery.dateRange.max)}}
+            div
+              | Percentual de nuvens: {{scenesQuery.cloudCover}}%
+
+        div.icon-return.col-sm-2(@click="backToSearch")
+          icon(name="arrow-left", scale="2")
+
+    div.scenes-list
+      ul.list-group
+        li.list-group-item(
+          v-for="(tileScenes, tileId) in foundScenes",
+          @click="selectTile({id: tileId})"
+        )
+          icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
+          span.title {{tileId}}
+          span.numScenes {{tileScenes.length}} cenas
+          div(v-if="selectedScenes[tileId]")
+            div.clearfix(v-for="scene in selectedScenes[tileId]")
+              small.float-left {{formattedDate(scene.sensing_time)}}
+              small.float-right {{scene.cloud_cover}}
+
+      div.col(v-if="hasSelectedScenes")
+
+        hr
+
         .form-group
-          button.btn.btn-primary.float-right
-            octicon.mr-2(name="search")
-            span(@click.prevent.stop="filtrar()") Buscar
+          label(for="scenes-band-composition") Composição de bandas:
+          div
+            input.form-control(
+              id="scenes-band-composition",
+              type="text",
+              v-model="outputBandComposition")
+
+        .form-group
+          label(for="scenes-output-format") Formato de saída:
+          div
+            select.form-control(
+              id="scenes-band-composition",
+              v-model="outputFileFormat")
+              option(v-for="format in outputFormats", :value="format") {{format}}
+
+        button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
+          icon.mr-2(name="file-download")
+          span Baixar cenas
+
 
 </template>
 
@@ -56,9 +118,16 @@
 
 import Multiselect from 'vue-multiselect';
 import DatePicker from 'vue2-datepicker';
-import Octicon from 'vue-octicon/components/Octicon.vue';
+import Icon from 'vue-awesome';
 
-import 'vue-octicon/icons/search';
+import { mapGetters } from 'vuex';
+
+import { VIEW_STATES } from '@/config';
+
+import {
+  FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
+  FILTER_SENTINEL_SCENES, SET_CURRENT_VIEW,
+} from '@/store/actions.type';
 
 import sentinel from '@/services/sentinel';
 
@@ -67,74 +136,155 @@ export default {
   components: {
     Multiselect,
     DatePicker,
-    Octicon,
+    Icon,
   },
   data() {
     return {
       expanded: false,
-      tiles: [],
-      selectedTiles: null,
-      dates: {
-        min: new Date(),
-        max: new Date(),
-      },
-      selectedDates: null,
+      selectedDates: [],
       cloudCover: 5,
+      outputBandComposition: '4,3,2',
+      outputFormats: ['img', 'tiff'],
+      outputFileFormat: 'img',
     };
   },
   methods: {
-    filtrar() {
-      // eslint-disable-next-line
-      console.log(this.cloudCover, this.selectedDates, this.selectedTiles);
+    filter() {
+      const dateRange = {
+        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
+        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
+      };
+      this.$store.dispatch(FILTER_SENTINEL_SCENES, {
+        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
+      });
+    },
+    selectTile(tile) {
+      this.$store.dispatch(SELECT_TILE, tile);
+    },
+    unselectTile(tile) {
+      this.$store.dispatch(UNSELECT_TILE, tile);
+    },
+    formattedDate(date) {
+      return new Date(date).toLocaleDateString('pt-br');
+    },
+    downloadScenes() {
+      let scenes = [];
+      Object.keys(this.selectedScenes).forEach((tileId) => {
+        scenes = scenes.concat(this.selectedScenes[tileId]);
+      });
+      const bandArray = this.outputBandComposition.split(',');
+      sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
+        .then((response) => {
+          // eslint-disable-next-line
+          console.log(response);
+          // eslint-disable-next-line
+          window.alert('Download em andamento');
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+          // eslint-disable-next-line
+          window.alert('Erro no download');
+        });
+    },
+    backToSearch() {
+      this.$store.dispatch(SET_CURRENT_VIEW, VIEW_STATES.SEARCH);
     },
   },
+  computed: {
+    ...mapGetters([
+      'tiles',
+      'foundScenes',
+      'selectedTiles',
+      'selectedScenes',
+      'dateRange',
+      'currentView',
+      'scenesQuery',
+    ]),
+    isSearching() {
+      return this.currentView === VIEW_STATES.SEARCH;
+    },
+    hasSelectedScenes() {
+      return Object.keys(this.foundScenes).some((tileId) => {
+        if (this.selectedScenes[tileId]) return true;
+        return false;
+      });
+    },
+    // countScenes() {
+    //   return Object.keys(this.scenes).length;
+    // },
+  },
   mounted() {
-    sentinel.tileList().then((response) => {
-      this.tiles = response.data;
-    });
-
-    sentinel.dateRange().then((response) => {
-      this.dates = {
-        min: new Date(response.data.min),
-        max: new Date(response.data.max),
-      };
-    });
+    this.$store.dispatch(FETCH_SENTINEL_TILES);
+    this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
+    [this.outputFileFormat] = this.outputFormats;
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
+
+.float-box {
+  background-color: #f3f3f3;
+}
 
 #tile-date-picker {
   width: 100%;
 }
 
-.float-box {
-  z-index: 10000;
-  position: absolute;
-  top: 60px;
-  bottom: 0;
+.scenes-list {
+  height: 80%;
+  overflow-y: auto;
+}
 
-  width: 600px;
-  background-color: white;
-  box-shadow: 2px 4px 8px #9c9c9c;
+.query-details {
+  padding: 10px;
+}
 
-  transform: translateX(0);
-  -webkit-transform: translateX(0);
-  animation-fill-mode: forwards;
-  transition-property: -webkit-transform,transform,opacity;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.0,0.0,0.2,1);
-
-  .float-box-view {
-    background-color: #FFF;
-    width: 100%;
-    height: 100%;
-    background-color: #FFF;
-    display: block;
-    position: relative;
-    overflow-x: hidden;
+.icon-return {
+  cursor: pointer;
+  padding: 22px;
+  &:hover {
+    background-color: #EFEFEF;
+  }
+  .fa-icon {
+    color: $icon-color;
   }
 }
+
+ul.list-group {
+
+  li.list-group-item {
+    cursor: pointer;
+    border-radius: 0;
+    &:hover {
+      background-color: #EFEFEF;
+    }
+    .title {
+      font-weight: bold;
+    }
+    .numScenes {
+      float: right;
+      font-size: 12px;
+      color: $secondary;
+    }
+    .fa-icon {
+      margin-right: 4px;
+      color: $success;
+    }
+  }
+
+}
+
+// ul.scenes-list {
+
+//   width: 100%;
+
+//   li {
+//     padding: 10px 15px;
+//   }
+
+// }
 
 </style>

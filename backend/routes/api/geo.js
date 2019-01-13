@@ -1,5 +1,5 @@
 var router = require('express').Router();
-var sentinelDownloader = require('../../utils/sentinelDownloader');
+var sentinelDownloader = require('../../utils/sentinelSceneInfoDownloader');
 
 router.get('/', (req, res, next) => {
     res.json({geo: 'Ok'});
