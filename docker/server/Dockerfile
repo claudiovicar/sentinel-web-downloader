@@ -17,3 +17,4 @@ COPY backend/ /usr/src/baixador-sentinel
 # CMD ["./node_modules/nodemon/bin/nodemon.js", "app.js"]
 
 EXPOSE 8123
+EXPOSE 9229

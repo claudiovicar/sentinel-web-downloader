@@ -14,7 +14,7 @@ exports.getSentinelRequestDestinationFolder = function(sentinelDownloadRequest) 
     COMPOSITION_IMG_NAME +
     sentinelDownloadRequest.bands.toString().split(',').join('_') +
     '.' +
-    sentinelDownloadRequest.outputFormat)
+    sentinelDownloadRequest.outputFormat);
 
 }
 

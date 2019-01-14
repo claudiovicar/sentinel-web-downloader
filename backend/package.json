@@ -8,9 +8,8 @@
   },
   "author": "Cláudio Vinícius de Carvalho",
   "license": "MIT",
+  "main": "app.js",
   "scripts": {
-    "start": "./node_modules/nodemon/bin/nodemon.js app.js",
-    "debug": "./node_modules/nodemon/bin/nodemon.js --inspect app.js",
     "lint": "eslint \"**/*.js\""
   },
   "dependencies": {

@@ -48,11 +48,9 @@ const app = express();
  * Connect to MongoDB.
  */
 
-if(isProduction){
-  mongoose.connect(process.env.MONGODB_URI);
-} else {
-  mongoose.connect('mongodb://localhost/sentinel');
-  // mongoose.set('debug', true);
+mongoose.connect(process.env.MONGODB_URI);
+if(!isProduction){
+  mongoose.set('debug', true);
 }
 
 mongoose.set('useFindAndModify', false);

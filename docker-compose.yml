@@ -30,10 +30,13 @@ services:
   server:
     container_name: server
     restart: always
-    command: nodemon --watch *.js
+    # command: nodemon --watch *.js
+    command: nodemon --inspect=0.0.0.0:9229 app.js
     build:
       context: ./
       dockerfile: ./docker/server/Dockerfile
+    volumes:
+      - ./backend:/usr/src/baixador-sentinel
     links:
       - mongo
     depends_on:
@@ -42,3 +45,4 @@ services:
      - MONGODB_URI=mongodb://mongo:27017/sentinel
     ports:
       - "8123:8123"
+      - "9229:9229"
