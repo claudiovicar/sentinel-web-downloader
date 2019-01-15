@@ -1,115 +1,121 @@
 <template lang="pug">
 
-  div.float-box.col-sm-6.col-lg-3(v-if="isSearching")
+  transition(
+    enter-active-class="animated slideInLeft",
+    leave-active-class="animated slideOutLeft"
+  )
 
-    div
+    div.float-box.col-sm-6.col-lg-3(v-if="teste", key="busca")
 
-      h4 Buscar cenas
+      div
 
-      form
+        h4 Buscar cenas
 
-        .form-group
-          label(for="tile-picker") Selecione os tiles:
-          multiselect(
-            id="tile-picker",
-            :value="selectedTiles",
-            :options="tiles",
-            :multiple="true",
-            :close-on-select="false",
-            :clear-on-select="false",
-            :preserve-search="true",
-            placeholder="Selecione..."
-            label="id",
-            track-by="id",
-            :preselect-first="false",
-            @select="selectTile",
-            @remove="unselectTile"
-          )
-            template(slot="option", slot-scope="props", @click="mouseover")
-              .option__desc
-                span.option__title {{ props.option.id }}
+        form
 
-        .form-group
-          label(for="tile-date-picker") Intervalo de datas:
-          date-picker(
-            id="tile-date-picker",
-            v-model='selectedDates',
-            lang='pt-br',
-            :not-before="dateRange.min",
-            :not-after="dateRange.max",
-            range)
+          .form-group
+            label(for="tile-picker") Selecione os tiles:
+            multiselect(
+              id="tile-picker",
+              :value="selectedTiles",
+              :options="tiles",
+              :multiple="true",
+              :close-on-select="false",
+              :clear-on-select="false",
+              :preserve-search="true",
+              placeholder="Selecione..."
+              label="id",
+              track-by="id",
+              :preselect-first="false",
+              @select="selectTile",
+              @remove="unselectTile"
+            )
+              template(slot="option", slot-scope="props", @click="mouseover")
+                .option__desc
+                  span.option__title {{ props.option.id }}
 
-        .form-group
-          label(for="tile-cloud-cover") Cobertura de nuvens (%):
-          div
-            input.form-control(
-              id="tile-cloud-cover",
-              type="number",
-              v-model="cloudCover",
-              min="0",
-              max="100")
+          .form-group
+            label(for="tile-date-picker") Intervalo de datas:
+            date-picker(
+              id="tile-date-picker",
+              v-model='selectedDates',
+              lang='pt-br',
+              :not-before="dateRange.min",
+              :not-after="dateRange.max",
+              range)
 
-      button.btn.btn-primary.float-right(@click="filter()")
-        icon.mr-2(name="search")
-        span Buscar
-
-  div.float-box.no-padding.col-sm-6.col-lg-3(v-else)
-
-    div.col
-
-      div.row
-        div.query-details.col-sm-10
-          small
-            div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
-              | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+          .form-group
+            label(for="tile-cloud-cover") Cobertura de nuvens (%):
             div
-              | Data:
-              | {{formattedDate(scenesQuery.dateRange.min)}}
-              | -
-              | {{formattedDate(scenesQuery.dateRange.max)}}
-            div
-              | Percentual de nuvens: {{scenesQuery.cloudCover}}%
+              input.form-control(
+                id="tile-cloud-cover",
+                type="number",
+                v-model="cloudCover",
+                min="0",
+                max="100")
 
-        div.icon-return.col-sm-2(@click="backToSearch")
-          icon(name="arrow-left", scale="2")
+        button.btn.btn-primary.float-right(@click="filter()")
+          icon.mr-2(name="search")
+          span Buscar
 
-    div.scenes-list
-      ul.list-group
-        li.list-group-item(
-          v-for="(tileScenes, tileId) in foundScenes",
-          @click="selectTile({id: tileId})"
-        )
-          icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
-          span.title {{tileId}}
-          span.numScenes {{tileScenes.length}} cenas
-          div(v-if="selectedScenes[tileId]")
-            div.clearfix(v-for="scene in selectedScenes[tileId]")
-              small.float-left {{formattedDate(scene.sensing_time)}}
-              small.float-right {{scene.cloud_cover}}
+    div.float-box.no-padding.col-sm-6.col-lg-3.animated(v-else, key="selecao")
 
-      div.col(v-if="hasSelectedScenes")
+      div.col
+        h1 Oi!
 
-        hr
+      //-   div.row
+      //-     div.query-details.col-sm-10
+      //-       small
+      //-         div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
+      //-           | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+      //-         div
+      //-           | Data:
+      //-           | {{formattedDate(scenesQuery.dateRange.min)}}
+      //-           | -
+      //-           | {{formattedDate(scenesQuery.dateRange.max)}}
+      //-         div
+      //-           | Percentual de nuvens: {{scenesQuery.cloudCover}}%
 
-        .form-group
-          label(for="scenes-band-composition") Composição de bandas:
-          div
-            input.form-control(
-              id="scenes-band-composition",
-              type="text",
-              v-model="outputBandComposition")
+      //-     div.icon-return.col-sm-2(@click="backToSearch")
+      //-       icon(name="arrow-left", scale="2")
 
-        .form-group
-          label(for="scenes-output-format") Formato de saída:
-          div
-            select.form-control(
-              id="scenes-band-composition",
-              v-model="outputFileFormat")
-              option(v-for="format in outputFormats", :value="format") {{format}}
+      //- div.scenes-list
+      //-   ul.list-group
+      //-     li.list-group-item(
+      //-       v-for="(tileScenes, tileId) in foundScenes",
+      //-       @click="selectTile({id: tileId})"
+      //-     )
+      //-       icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
+      //-       span.title {{tileId}}
+      //-       span.numScenes {{tileScenes.length}} cenas
+      //-       div(v-if="selectedScenes[tileId]")
+      //-         div.clearfix(v-for="scene in selectedScenes[tileId]")
+      //-           small.float-left {{formattedDate(scene.sensing_time)}}
+      //-           small.float-right {{scene.cloud_cover}}
 
-        button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
-          icon.mr-2(name="file-download")
-          span Baixar cenas
+      //-   div.col(v-if="hasSelectedScenes")
+
+      //-     hr
+
+      //-     .form-group
+      //-       label(for="scenes-band-composition") Composição de bandas:
+      //-       div
+      //-         input.form-control(
+      //-           id="scenes-band-composition",
+      //-           type="text",
+      //-           v-model="outputBandComposition")
+
+      //-     .form-group
+      //-       label(for="scenes-output-format") Formato de saída:
+      //-       div
+      //-         select.form-control(
+      //-           id="scenes-band-composition",
+      //-           v-model="outputFileFormat")
+      //-           option(v-for="format in outputFormats", :value="format") {{format}}
+
+      //-     button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
+      //-       icon.mr-2(name="file-download")
+      //-       span Baixar cenas
 
 
 </template>
@@ -126,7 +132,8 @@ import { VIEW_STATES } from '@/config';
 
 import {
   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
-  FILTER_SENTINEL_SCENES, SET_CURRENT_VIEW,
+  // FILTER_SENTINEL_SCENES,
+  SET_CURRENT_VIEW,
 } from '@/store/actions.type';
 
 import sentinel from '@/services/sentinel';
@@ -146,17 +153,19 @@ export default {
       outputBandComposition: '4,3,2',
       outputFormats: ['img', 'tiff'],
       outputFileFormat: 'img',
+      teste: true,
     };
   },
   methods: {
     filter() {
-      const dateRange = {
-        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
-        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
-      };
-      this.$store.dispatch(FILTER_SENTINEL_SCENES, {
-        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
-      });
+      // const dateRange = {
+      //   min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
+      //   max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
+      // };
+      // this.$store.dispatch(FILTER_SENTINEL_SCENES, {
+      //   selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
+      // });
+      this.teste = !this.teste;
     },
     selectTile(tile) {
       this.$store.dispatch(SELECT_TILE, tile);

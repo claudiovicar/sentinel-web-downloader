@@ -60,6 +60,9 @@ function readCSV(path) {
 
   let registers = [];
 
+  // TODO: Obter último id ou data inserida no banco.
+  // No on("data"), abaixo, limitar àqueles não inseridos ainda.
+
   fastCSV
     .fromStream(stream, {headers: csvHeaders})
     .on("data", function(data){
