@@ -12,6 +12,10 @@ export default {
     return axios.post(fullURL('/update'));
   },
 
+  getLastUpdateDate() {
+    return axios.get(fullURL('/lastUpdate'));
+  },
+
   getGridSentinel() {
     return axios.get(fullURL('/sentinel-grid'));
   },

@@ -18,8 +18,16 @@ router.get('/brasil', (req, res, next) => {
 router.post('/update', (req, res, next) => {
     sentinelSceneInfoDownloader.process();
     res.json({'ok': true});
-    // let path = 'geojson/brasil.geojson';
-    // res.sendFile(path, {root: './public'});
+});
+
+router.get('/lastUpdate', (req, res, next) => {
+    sentinelSceneInfoDownloader.getLastSuccessfulUpdateDate()
+        .then((updateDate) => {
+            res.json(updateDate);
+        })
+        .catch((err) => {
+            res.send(500)
+        });
 });
 
 module.exports = router;

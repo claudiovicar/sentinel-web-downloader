@@ -6,8 +6,8 @@
         icon.mr-2(name="cloud-download-alt")
         span Consultar cenas baixadas
 
-    .float-right(v-if="dateRange.max")
-      label Última atualização: {{dateRange.max.toLocaleString('pt-br')}}
+    .float-right(v-if="lastUpdateDate")
+      label Última atualização: {{lastUpdateDate.toLocaleString('pt-br')}}
 
       button.btn.btn-sm.btn-success.ml-2(@click="update()")
         icon.mr-2(name="sync")
@@ -17,8 +17,6 @@
 
 <script>
 import Icon from 'vue-awesome';
-
-import { mapGetters } from 'vuex';
 
 import geo from '@/services/geo';
 
@@ -31,6 +29,9 @@ export default {
   },
   data() {
     return {
+      lastUpdateDate: {
+        type: Date,
+      },
     };
   },
   methods: {
@@ -41,13 +42,16 @@ export default {
       geo.updateSceneList();
     },
   },
-  computed: {
-    ...mapGetters([
-      'dateRange',
-    ]),
-  },
   mounted() {
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
+
+    geo.getLastUpdateDate()
+      .then((response) => {
+        this.lastUpdateDate = new Date(response.data);
+      })
+      .catch(() => {
+        // Exibir alerta
+      });
   },
 };
 </script>

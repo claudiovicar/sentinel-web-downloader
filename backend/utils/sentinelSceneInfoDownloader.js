@@ -171,3 +171,4 @@ function getLastSuccessfulUpdateDate() {
 }
 
 exports.process = fetchScenes;
+exports.getLastSuccessfulUpdateDate = getLastSuccessfulUpdateDate;
