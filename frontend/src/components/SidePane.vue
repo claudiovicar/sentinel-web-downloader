@@ -5,7 +5,7 @@
     leave-active-class="animated slideOutLeft"
   )
 
-    div.float-box.col-sm-6.col-lg-3(v-if="teste", key="busca")
+    div.float-box.col-sm-6.col-lg-3(v-if="isSearching", key="busca")
 
       div
 
@@ -61,61 +61,60 @@
     div.float-box.no-padding.col-sm-6.col-lg-3.animated(v-else, key="selecao")
 
       div.col
-        h1 Oi!
 
-      //-   div.row
-      //-     div.query-details.col-sm-10
-      //-       small
-      //-         div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
-      //-           | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
-      //-         div
-      //-           | Data:
-      //-           | {{formattedDate(scenesQuery.dateRange.min)}}
-      //-           | -
-      //-           | {{formattedDate(scenesQuery.dateRange.max)}}
-      //-         div
-      //-           | Percentual de nuvens: {{scenesQuery.cloudCover}}%
+        div.row
+          div.query-details.col-sm-10
+            small
+              div.text-truncate(:title="scenesQuery.selectedTiles.map(t => t.id)")
+                | Tiles: {{scenesQuery.selectedTiles.map(t => t.id).toString()}}
+              div
+                | Data:
+                | {{formattedDate(scenesQuery.dateRange.min)}}
+                | -
+                | {{formattedDate(scenesQuery.dateRange.max)}}
+              div
+                | Percentual de nuvens: {{scenesQuery.cloudCover}}%
 
-      //-     div.icon-return.col-sm-2(@click="backToSearch")
-      //-       icon(name="arrow-left", scale="2")
+          div.icon-return.col-sm-2(@click="backToSearch")
+            icon(name="arrow-left", scale="2")
 
-      //- div.scenes-list
-      //-   ul.list-group
-      //-     li.list-group-item(
-      //-       v-for="(tileScenes, tileId) in foundScenes",
-      //-       @click="selectTile({id: tileId})"
-      //-     )
-      //-       icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
-      //-       span.title {{tileId}}
-      //-       span.numScenes {{tileScenes.length}} cenas
-      //-       div(v-if="selectedScenes[tileId]")
-      //-         div.clearfix(v-for="scene in selectedScenes[tileId]")
-      //-           small.float-left {{formattedDate(scene.sensing_time)}}
-      //-           small.float-right {{scene.cloud_cover}}
+      div.scenes-list
+        ul.list-group
+          li.list-group-item(
+            v-for="(tileScenes, tileId) in foundScenes",
+            @click="selectTile({id: tileId})"
+          )
+            icon(v-if="selectedScenes[tileId]", name="check", scale="1.2")
+            span.title {{tileId}}
+            span.numScenes {{tileScenes.length}} cenas
+            div(v-if="selectedScenes[tileId]")
+              div.clearfix(v-for="scene in selectedScenes[tileId]")
+                small.float-left {{formattedDate(scene.sensing_time)}}
+                small.float-right {{scene.cloud_cover}}
 
-      //-   div.col(v-if="hasSelectedScenes")
+        div.col(v-if="hasSelectedScenes")
 
-      //-     hr
+          hr
 
-      //-     .form-group
-      //-       label(for="scenes-band-composition") Composição de bandas:
-      //-       div
-      //-         input.form-control(
-      //-           id="scenes-band-composition",
-      //-           type="text",
-      //-           v-model="outputBandComposition")
+          .form-group
+            label(for="scenes-band-composition") Composição de bandas:
+            div
+              input.form-control(
+                id="scenes-band-composition",
+                type="text",
+                v-model="outputBandComposition")
 
-      //-     .form-group
-      //-       label(for="scenes-output-format") Formato de saída:
-      //-       div
-      //-         select.form-control(
-      //-           id="scenes-band-composition",
-      //-           v-model="outputFileFormat")
-      //-           option(v-for="format in outputFormats", :value="format") {{format}}
+          .form-group
+            label(for="scenes-output-format") Formato de saída:
+            div
+              select.form-control(
+                id="scenes-band-composition",
+                v-model="outputFileFormat")
+                option(v-for="format in outputFormats", :value="format") {{format}}
 
-      //-     button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
-      //-       icon.mr-2(name="file-download")
-      //-       span Baixar cenas
+          button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
+            icon.mr-2(name="file-download")
+            span Baixar cenas
 
 
 </template>
@@ -132,8 +131,7 @@ import { VIEW_STATES } from '@/config';
 
 import {
   FETCH_SENTINEL_TILES, FETCH_SENTINEL_DATE_RANGE, SELECT_TILE, UNSELECT_TILE,
-  // FILTER_SENTINEL_SCENES,
-  SET_CURRENT_VIEW,
+  FILTER_SENTINEL_SCENES, SET_CURRENT_VIEW,
 } from '@/store/actions.type';
 
 import sentinel from '@/services/sentinel';
@@ -153,19 +151,17 @@ export default {
       outputBandComposition: '4,3,2',
       outputFormats: ['img', 'tiff'],
       outputFileFormat: 'img',
-      teste: true,
     };
   },
   methods: {
     filter() {
-      // const dateRange = {
-      //   min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
-      //   max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
-      // };
-      // this.$store.dispatch(FILTER_SENTINEL_SCENES, {
-      //   selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
-      // });
-      this.teste = !this.teste;
+      const dateRange = {
+        min: this.selectedDates ? this.selectedDates[0].toISOString() : this.dateRange.min,
+        max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
+      };
+      this.$store.dispatch(FILTER_SENTINEL_SCENES, {
+        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
+      });
     },
     selectTile(tile) {
       this.$store.dispatch(SELECT_TILE, tile);
@@ -227,6 +223,7 @@ export default {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
     [this.outputFileFormat] = this.outputFormats;
+    // TODO: Update sentinelTiles (para funcionar ao voltar da tela de downloads)
   },
 };
 </script>

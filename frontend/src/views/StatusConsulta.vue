@@ -1,5 +1,10 @@
 <template lang="pug">
 
+  transition(
+    enter-active-class="animated fadeIn",
+    leave-active-class="animated fadeOut"
+  )
+
     div.container
         h2
             | Acompanhe o andamento dos downloads

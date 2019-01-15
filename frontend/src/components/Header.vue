@@ -20,6 +20,8 @@ import Icon from 'vue-awesome';
 
 import { mapGetters } from 'vuex';
 
+import geo from '@/services/geo';
+
 import { FETCH_SENTINEL_DATE_RANGE } from '@/store/actions.type';
 
 export default {
@@ -36,7 +38,7 @@ export default {
       this.$router.push({ name: 'consulta' });
     },
     update() {
-      // updateService.update()
+      geo.updateSceneList();
     },
   },
   computed: {

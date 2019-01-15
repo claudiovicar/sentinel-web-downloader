@@ -18,7 +18,7 @@ module.exports = {
     hotOnly: false,
     proxy: {
       [httpPath]: {
-        target: 'http://localhost:8124/',
+        target: 'http://localhost:8123/',
         changeOrigin: false,
       },
     },

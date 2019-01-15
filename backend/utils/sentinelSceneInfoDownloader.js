@@ -1,6 +1,5 @@
 /**
  * Class for downloading and parsing the .CSV file with scene info from GoogleCloud
- *
  */
 
 const {promisify} = require('util');
@@ -11,6 +10,7 @@ const fs = require('fs');
 
 const SentinelScene = require('../models/SentinelScene');
 const SentinelTile = require('../models/SentinelTile');
+const SentinelUpdate = require('../models/SentinelUpdate');
 
 const SENTINEL2_METADATA_URL = process.env.SENTINEL2_METADATA_URL;
 // const SENTINEL2_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-sentinel-2/index.csv.gz';
@@ -25,26 +25,41 @@ let tileIDs = [];
 
 async function fetchScenes() {
 
+  const newUpdate = new SentinelUpdate();
+  await newUpdate.save();
+
   console.log('Carregando ids dos tiles de interesse');
   fillTileIds();
   // console.log(tileIDs);
 
-  console.log('Buscando cenas Sentinel');
+  console.log(`Buscando cenas Sentinel ${SENTINEL2_METADATA_URL}`);
   let tempTar = fileUtils.createTempFile();
   let tempCSV = fileUtils.createTempFile();
 
-  try {
-    await fileUtils.download(SENTINEL2_METADATA_URL, tempTar.name);
-    await unzip(tempTar.name, tempCSV.name);
+  newUpdate.status = 'IN_PROGRESS';
+  await newUpdate.save();
 
-    readCSV(tempCSV.name);
+  try {
+    console.log('Baixando...');
+    await fileUtils.download(SENTINEL2_METADATA_URL, tempTar.name, {});
+    console.log('Extraindo...');
+    await unzip(tempTar.name, tempCSV.name);
+    const lastUpdateDate = await getLastSuccessfulUpdateDate();
+
+    await readAndInsertCSV(tempCSV.name, lastUpdateDate);
+
+    newUpdate.status = 'DONE';
   } catch(e) {
     console.error('Erro ao processar arquivo CSV =(');
     console.error(e);
+    newUpdate.status = 'ERROR';
   } finally {
     tempTar.removeCallback();
     tempCSV.removeCallback();
+    newUpdate.date = new Date();
+    await newUpdate.save();
   }
+
 }
 
 function unzip(path, dest) {
@@ -52,8 +67,11 @@ function unzip(path, dest) {
   return asyncGunzip(path, dest);
 }
 
-function readCSV(path) {
+// TODO: Transformar em async
+async function readAndInsertCSV(path, lastUpdateDate) {
+
   console.log(`Lendo CSV ${path}`);
+  console.log(`Última atualização em ${lastUpdateDate}`);
 
   // const stream = fs.createReadStream("/home/claudio/Downloads/sample.csv");
   const stream = fs.createReadStream(path);
@@ -63,40 +81,56 @@ function readCSV(path) {
   // TODO: Obter último id ou data inserida no banco.
   // No on("data"), abaixo, limitar àqueles não inseridos ainda.
 
-  fastCSV
-    .fromStream(stream, {headers: csvHeaders})
-    .on("data", function(data){
-      if (data && Object.keys(data).length === csvHeaders.length && data['granule_id'] !== 'GRANULE_ID') {
+  return new Promise((resolve, reject) => {
 
-        if(tileIDs.indexOf(data.tile_id) >= 0) {
-          SentinelTile.findOne({id: data.tile_id}).exec()
-          .then(tile => {
+    try {
 
-            data.tile = tile;
-            registers.push(data);
+      fastCSV
+      .fromStream(stream, {headers: csvHeaders})
+      .on("data", function(scene){
+        if (scene && Object.keys(scene).length === csvHeaders.length && scene['granule_id'] !== 'GRANULE_ID') {
+          // TODO: Colocar findOne do tile em um cache
+          if(shouldAddTile(scene.tile_id)) {
+            SentinelTile.findOne({id: scene.tile_id}).exec()
+            .then(tile => {
 
-            if (registers.length > 1000) {
-              console.log("Inserting in the database...");
-              SentinelScene.insertMany(registers)
-                .then(() => {console.log('Dados inseridos com sucesso!');})
-                .catch((e) => {
-                  console.error('Erro ao inserir dados no banco.');
-                  console.error(e);
-                });
-              registers = [];
-            }
+              scene.tile = tile;
 
-          });
+              if(!lastUpdateDate || new Date(scene.sensing_time) > lastUpdateDate)
+                registers.push(scene);
+              // else
+              //   console.log(`Ignorando cena ${scene.granule_id}`)
+
+              if (registers.length > 1000) {
+                console.log("Inserting in the database...");
+                SentinelScene.insertMany(registers)
+                  .then(() => {console.log('Dados inseridos com sucesso!');})
+                  .catch((e) => {
+                    console.error('Erro ao inserir dados no banco.');
+                    console.error(e);
+                  });
+                registers = [];
+              }
+
+            });
+          }
+
         }
+        else{
+          console.log(`Erro ao processar registro ${JSON.stringify(scene)}`);
+        }
+      })
+      .on("end", function(){
+        console.log("Done reading CSV.");
+        resolve();
+      });
 
-      }
-      else{
-        console.log(`Erro ao processar registro ${JSON.stringify(data)}`);
-      }
-    })
-    .on("end", function(){
-      console.log("Done reading CSV.");
-    });
+    }
+    catch(err) {
+      reject(err);
+    }
+
+  });
 
 }
 
@@ -112,10 +146,28 @@ function fillTileIds() {
 
     tileIDs.push(feature.properties.TileID);
 
-    new SentinelTile({id: feature.properties.TileID}).save();
+    SentinelTile.findOneOrCreate({id: feature.properties.TileID});
+    // new SentinelTile({id: feature.properties.TileID}).save();
 
   });
 
+}
+
+/**
+ * Inserts only the desired tiles, based on the source GeoJSON
+ */
+function shouldAddTile(tileId) {
+  return tileIDs.indexOf(tileId) >= 0;
+}
+
+function getLastSuccessfulUpdateDate() {
+  return SentinelUpdate.lastSuccessfulUpdate()
+    .then(lastUpdate => {
+      return lastUpdate.date;
+    })
+    .catch(err => {
+      return null;
+    });
 }
 
 exports.process = fetchScenes;

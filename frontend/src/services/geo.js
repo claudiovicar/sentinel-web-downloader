@@ -8,6 +8,10 @@ function fullURL(path) {
 
 export default {
 
+  updateSceneList() {
+    return axios.post(fullURL('/update'));
+  },
+
   getGridSentinel() {
     return axios.get(fullURL('/sentinel-grid'));
   },

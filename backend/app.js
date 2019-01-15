@@ -49,9 +49,9 @@ const app = express();
  */
 
 mongoose.connect(process.env.MONGODB_URI);
-if(!isProduction){
-  mongoose.set('debug', true);
-}
+// if(!isProduction){
+//   mongoose.set('debug', true);
+// }
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);

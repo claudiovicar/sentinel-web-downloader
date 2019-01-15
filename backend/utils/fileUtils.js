@@ -1,10 +1,8 @@
 const {promisify} = require('util');
 const tmp = require('tmp');
-var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
-
 
 const download = function(url, dest, options, callback) {
 
@@ -23,15 +21,17 @@ const download = function(url, dest, options, callback) {
       });
     });
   }).on('error', function(err) {
-    fs.unlink(dest);
+    fs.unlinkSync(dest);
+    console.error(err);
     if (callback) callback(err.message);
   });
+
 };
 
 const downloadToTemp = function(url, callback) {
   let tempTile = this.createTempFile();
 
-  this.download(url, tempTile.name, callback);
+  this.download(url, tempTile.name, {}, callback);
 
   return tempTile;
 };

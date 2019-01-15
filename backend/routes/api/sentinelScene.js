@@ -39,7 +39,13 @@ router.get('/dateRange', (req, res) => {
     SentinelScene.findOne({}).select('id sensing_time').sort({sensing_time: 1}).limit(1).exec(),
     SentinelScene.findOne({}).select('id sensing_time').sort({sensing_time: -1}).limit(1).exec()
   ]).then(function(results) {
-    res.json({min: results[0].sensing_time, max: results[1].sensing_time});
+    if (results && results.length)
+      res.json({min: results[0].sensing_time, max: results[1].sensing_time});
+    else
+      res.sendStatus(500);
+  })
+  .catch((e) => {
+    res.sendStatus(500);
   });
 
 });
@@ -63,7 +69,6 @@ router.get('/:id/preview', (req, res) => {
     res.sendFile(imagePath);
   })
   .catch((e) => {
-    // console.log(e);
     res.sendStatus(500);
   });
 

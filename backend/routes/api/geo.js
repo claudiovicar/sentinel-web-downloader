@@ -15,7 +15,7 @@ router.get('/brasil', (req, res, next) => {
     res.sendFile(path, {root: './public'});
 });
 
-router.get('/update', (req, res, next) => {
+router.post('/update', (req, res, next) => {
     sentinelSceneInfoDownloader.process();
     res.json({'ok': true});
     // let path = 'geojson/brasil.geojson';
