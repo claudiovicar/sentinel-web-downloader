@@ -1,4 +1,5 @@
 const fs = require('fs');
+const url = require('url');
 const path = require('path');
 const xml2js = require('xml2js');
 
@@ -75,10 +76,10 @@ function getResourceURL(scene, pattern, resourcePattern) {
   for (let index = 0; index < objects.length; index++) {
     const object = objects[index];
     if (object['$'].ID.match(pattern)) {
-      const baseURL = scene.base_url.replace('gs://', GOOGLE_STORAGE_URL);
+      // const baseURL = scene.base_url.replace('gs://', GOOGLE_STORAGE_URL);
       const resourceURL = object['byteStream'][0].fileLocation[0]['$'].href;
       if (!resourcePattern || resourceURL.match(resourcePattern)) {
-        return path.join(baseURL, resourceURL);
+        return url.resolve(GOOGLE_STORAGE_URL, path.join(scene.base_url.replace('gs://', ''), resourceURL));
       }
     }
   }
