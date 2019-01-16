@@ -48,7 +48,7 @@ const app = express();
  * Connect to MongoDB.
  */
 
-mongoose.connect(process.env.MONGODB_URI);
+// mongoose.connect(process.env.MONGODB_URI);
 // if(!isProduction){
 //   mongoose.set('debug', true);
 // }
