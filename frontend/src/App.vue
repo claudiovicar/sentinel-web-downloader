@@ -1,5 +1,6 @@
 <template lang="pug">
     #app
+      vue-snotify
       .container-fluid
         router-view
 </template>

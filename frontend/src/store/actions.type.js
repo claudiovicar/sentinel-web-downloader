@@ -6,3 +6,4 @@ export const SELECT_TILE = 'selectTile';
 export const UNSELECT_TILE = 'unselectTile';
 export const SELECT_SCENE = 'selectScene';
 export const SET_CURRENT_VIEW = 'setCurrentView';
+export const NOTIFY = 'notify';

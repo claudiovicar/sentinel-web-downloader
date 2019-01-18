@@ -136,6 +136,11 @@ import {
 
 import sentinel from '@/services/sentinel';
 
+function goToDownloadsPage(toast) {
+  this.$snotify.remove(toast.id);
+  this.$router.push({ name: 'consulta' });
+}
+
 export default {
   name: 'SidePane',
   components: {
@@ -179,11 +184,14 @@ export default {
       });
       const bandArray = this.outputBandComposition.split(',');
       sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
-        .then((response) => {
-          // eslint-disable-next-line
-          console.log(response);
-          // eslint-disable-next-line
-          window.alert('Download em andamento');
+        .then(() => {
+          this.$snotify.confirm('Visite a página de consulta de cenas para verificar o andamento dos downloads.',
+            'Download iniciado',
+            {
+              buttons: [
+                { text: 'Consultar cenas baixadas', action: goToDownloadsPage.bind(this) },
+              ],
+            });
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -194,6 +202,13 @@ export default {
     },
     backToSearch() {
       this.$store.dispatch(SET_CURRENT_VIEW, VIEW_STATES.SEARCH);
+    },
+    notifySearchResult() {
+      if (this.foundScenes) {
+        const countScenes = Object.keys(this.foundScenes)
+          .reduce((count, scene) => count + this.foundScenes[scene].length, 0);
+        this.$snotify.info(`${countScenes} cenas encontradas`, 'Busca efetuada', { timeout: 3500 });
+      }
     },
   },
   computed: {
@@ -219,6 +234,13 @@ export default {
     //   return Object.keys(this.scenes).length;
     // },
   },
+  watch: {
+    isSearching() {
+      if (!this.isSearching) {
+        this.notifySearchResult();
+      }
+    },
+  },
   mounted() {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
@@ -239,11 +261,6 @@ export default {
   width: 100%;
 }
 
-.scenes-list {
-  height: 80%;
-  overflow-y: auto;
-}
-
 .query-details {
   padding: 10px;
 }
@@ -259,38 +276,31 @@ export default {
   }
 }
 
-ul.list-group {
+.scenes-list {
+  ul.list-group {
+    max-height: 460px;
+    overflow-y: auto;
 
-  li.list-group-item {
-    cursor: pointer;
-    border-radius: 0;
-    &:hover {
-      background-color: #EFEFEF;
-    }
-    .title {
-      font-weight: bold;
-    }
-    .numScenes {
-      float: right;
-      font-size: 12px;
-      color: $secondary;
-    }
-    .fa-icon {
-      margin-right: 4px;
-      color: $success;
+    li.list-group-item {
+      cursor: pointer;
+      border-radius: 0;
+      &:hover {
+        background-color: #EFEFEF;
+      }
+      .title {
+        font-weight: bold;
+      }
+      .numScenes {
+        float: right;
+        font-size: 12px;
+        color: $secondary;
+      }
+      .fa-icon {
+        margin-right: 4px;
+        color: $success;
+      }
     }
   }
-
 }
-
-// ul.scenes-list {
-
-//   width: 100%;
-
-//   li {
-//     padding: 10px 15px;
-//   }
-
-// }
 
 </style>

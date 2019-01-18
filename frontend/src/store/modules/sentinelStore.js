@@ -20,6 +20,7 @@ import {
   UNSELECT_TILE,
   SELECT_SCENE,
   SET_CURRENT_VIEW,
+  NOTIFY,
 } from '../actions.type';
 
 import geo from '@/services/geo';
@@ -111,6 +112,7 @@ export default {
       state.sentinelGrid = grid;
     },
     [SET_SCENES_QUERY](state, query) {
+      state.foundScenes = null;
       state.scenesQuery = query;
     },
   },
@@ -164,6 +166,11 @@ export default {
     },
     [SET_CURRENT_VIEW](context, viewState) {
       context.commit(SET_CURRENT_VIEW, viewState);
+    },
+    [NOTIFY](context, options) {
+      const type = options.type || 'info';
+      // eslint-disable-next-line
+      this._vm.$snotify[type](options.content, options.title, options);
     },
   },
 };
