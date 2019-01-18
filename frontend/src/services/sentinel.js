@@ -1,19 +1,15 @@
-import axios from 'axios';
+import http from './http';
 
 const BASE_URL = `${process.env.VUE_APP_HTTP_PATH}sentinel`;
-
-function fullURL(path) {
-  return BASE_URL + path;
-}
 
 export default {
 
   tileList() {
-    return axios.get(fullURL('/tiles/list'));
+    return http.get(`${BASE_URL}/tiles/list`);
   },
 
   dateRange() {
-    return axios.get(fullURL('/scenes/dateRange'));
+    return http.get(`${BASE_URL}/scenes/dateRange`);
   },
 
   filterScenes(tiles, dateRange, cloudCover) {
@@ -22,24 +18,24 @@ export default {
       dateRange,
       cloudCover,
     };
-    return axios.post(fullURL('/scenes/filter'), params);
+    return http.post(`${BASE_URL}/scenes/filter`, params);
   },
 
   getPreview(sceneId) {
-    return axios.get(`/sentinel/scenes/${sceneId}/preview`);
+    return http.get(`${BASE_URL}/scenes/${sceneId}/preview`);
   },
 
   generateComposition(scenes, bandComposition, outputFormat) {
-    return axios.post(fullURL('/scenes/generateComposition'), { scenes, outputFormat, bandComposition });
+    return http.post(`${BASE_URL}/scenes/generateComposition`, { scenes, outputFormat, bandComposition });
   },
 
   getDownloadStatus() {
-    return axios.get(fullURL('/scenes/downloadStatus'));
+    return http.get(`${BASE_URL}/scenes/downloadStatus`);
   },
 
   downloadScene(request) {
     // eslint-disable-next-line
-    window.location.href = fullURL(`/scenes/download/${request._id}`);
+    window.location.href = `${BASE_URL}/scenes/download/${request._id}`;
   },
 
 };

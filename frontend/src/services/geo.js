@@ -1,27 +1,23 @@
-import axios from 'axios';
+import http from './http';
 
 const BASE_URL = `${process.env.VUE_APP_HTTP_PATH}geo`;
-
-function fullURL(path) {
-  return BASE_URL + path;
-}
 
 export default {
 
   updateSceneList() {
-    return axios.post(fullURL('/update'));
+    return http.post(`${BASE_URL}/update`);
   },
 
   getLastUpdateDate() {
-    return axios.get(fullURL('/lastUpdate'));
+    return http.get(`${BASE_URL}/lastUpdate`);
   },
 
   getGridSentinel() {
-    return axios.get(fullURL('/sentinel-grid'));
+    return http.get(`${BASE_URL}/sentinel-grid`);
   },
 
   getUFs() {
-    return axios.get(fullURL('/brasil'));
+    return http.get(`${BASE_URL}/brasil`);
   },
 
 };
