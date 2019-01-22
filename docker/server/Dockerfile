@@ -60,3 +60,4 @@ RUN ldconfig
 
 # Fim da instalação do GDAL
 
+WORKDIR /usr/src/baixador-sentinel
