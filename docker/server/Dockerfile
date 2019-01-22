@@ -58,6 +58,13 @@ RUN ldconfig
 
 # CMD gdalinfo --version && gdalinfo --formats && ogrinfo --formats
 
+# python-gdal
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+# RUN apt install gdal-bin python-gdal python3-gdal
+RUN apt install python-gdal
+
 # Fim da instalação do GDAL
 
 WORKDIR /usr/src/baixador-sentinel
