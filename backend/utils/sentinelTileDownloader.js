@@ -28,6 +28,7 @@ async function downloadBands(scenes, outputFormat = 'img', bandComposition = [4,
     const scene = await SentinelScene.findById(scenes[index]._id).populate('tile').exec();
 
     const request = await new SentinelDownloadRequest({bands: bandComposition, outputFormat, scene}).save()
+    requestGroup.requests.push(request);
   }
 
   requestGroup.save();
