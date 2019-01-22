@@ -3,7 +3,8 @@ const manifestUtils = require('./manifestUtils');
 const sentinelUtils = require('./sentinelUtils');
 
 const SentinelScene = require('../models/SentinelScene');
-const SentinelDownloadRequest = require('../models/SentinelDownloadRequest');
+const SentinelDownloadRequest = require('../models/SentinelDownloadRequest').SentinelDownloadRequest;
+const SentinelDownloadRequestGroup = require('../models/SentinelDownloadRequest').SentinelDownloadRequestGroup;
 
 const fs = require('fs');
 const path = require('path');
@@ -21,12 +22,15 @@ const GDAL_OUTPUT_FORMATS = {
 
 async function downloadBands(scenes, outputFormat = 'img', bandComposition = [4,3,2]) {
 
+  const requestGroup = new SentinelDownloadRequestGroup();
+
   for (let index = 0; index < scenes.length; index++) {
     const scene = await SentinelScene.findById(scenes[index]._id).populate('tile').exec();
 
-    new SentinelDownloadRequest({bands: bandComposition, outputFormat, scene}).save();
-
+    const request = await new SentinelDownloadRequest({bands: bandComposition, outputFormat, scene}).save()
   }
+
+  requestGroup.save();
 
   downloadBandImages();
 

@@ -11,9 +11,11 @@
 
         label(@click="navigateBack()") Voltar
 
-        div.row.request-list(v-if="requests")
+        div.request-list(v-if="requestGroups")
+          div(v-for="group in requestGroups")
+            h5 {{group._id}}
             ul.list-group.col
-                ul.list-group-item(v-for="request in requests")
+                ul.list-group-item(v-for="request in group.requests")
                     div {{request.scene.granule_id}}
                     div {{request.bands}}
                     //- div {{request.status}}
@@ -28,7 +30,7 @@ import sentinel from '@/services/sentinel';
 export default {
   data() {
     return {
-      requests: null,
+      requestGroups: null,
     };
   },
   methods: {
@@ -38,7 +40,7 @@ export default {
     update() {
       sentinel.getDownloadStatus()
         .then((response) => {
-          this.requests = response.data;
+          this.requestGroups = response.data;
         })
         // eslint-disable-next-line
         .catch(e => console.log(e));

@@ -4,7 +4,8 @@ const sentinelUtils = require('../../utils/sentinelUtils');
 const tileDownloader = require('../../utils/sentinelTileDownloader');
 
 const SentinelScene = require('../../models/SentinelScene');
-const SentinelDownloadRequest = require('../../models/SentinelDownloadRequest');
+const SentinelDownloadRequest = require('../../models/SentinelDownloadRequest').SentinelDownloadRequest;
+const SentinelDownloadRequestGroup = require('../../models/SentinelDownloadRequest').SentinelDownloadRequestGroup;
 
 router.param('id', function(req, res, next, id) {
   SentinelScene.findById(id).populate('tile').exec()
@@ -83,6 +84,7 @@ router.post('/generateComposition', (req, res) => {
     res.sendStatus(200);
   })
   .catch((e) => {
+    console.error(e);
     res.sendStatus(500);
   });
 
@@ -90,10 +92,15 @@ router.post('/generateComposition', (req, res) => {
 
 router.get('/downloadStatus', (req, res) => {
 
-  SentinelDownloadRequest.find({})
+  // SentinelDownloadRequest.find({})
+  SentinelDownloadRequestGroup.find({})
   .populate({
-    path: 'scene',
-    select: 'granule_id cloud_cover -_id'})
+    path: 'requests',
+    populate: {
+      path: 'scene',
+      select: 'granule_id cloud_cover -_id'
+    }
+  })
   .then((requests) => {
     res.send(requests);
   })

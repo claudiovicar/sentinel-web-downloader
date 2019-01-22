@@ -12,6 +12,14 @@ var SentinelDownloadRequestSchema = new mongoose.Schema({
   finishDate: { type: Date }
 });
 
-var SentinelDownloadRequest = mongoose.model('SentinelDownloadRequest', SentinelDownloadRequestSchema);
+var SentinelDownloadRequestGroupSchema = new mongoose.Schema({
+  requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SentinelDownloadRequest' }]
+});
 
-module.exports = SentinelDownloadRequest;
+var SentinelDownloadRequest = mongoose.model('SentinelDownloadRequest', SentinelDownloadRequestSchema);
+var SentinelDownloadRequestGroup = mongoose.model('SentinelDownloadRequestGroup', SentinelDownloadRequestGroupSchema);
+
+module.exports = {
+  SentinelDownloadRequest: SentinelDownloadRequest,
+  SentinelDownloadRequestGroup: SentinelDownloadRequestGroup
+};
