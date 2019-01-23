@@ -51,11 +51,10 @@ async function downloadBandImages() {
     .exec();
   if (!queuedRequests.length) return;
 
-  queuedRequests.forEach(request => {
-
-    downloadAndGenerateBandComposition(request);
-
-  });
+  for (let index = 0; index < queuedRequests.length; index++) {
+    const request = queuedRequests[index];
+    await downloadAndGenerateBandComposition(request);
+  }
 
 }
 

@@ -5,23 +5,41 @@
     leave-active-class="animated fadeOut"
   )
 
-    div.container
+    div.container.wrapper
+
+      div.affix
         h2
             | Acompanhe o andamento dos downloads
 
         label(@click="navigateBack()") Voltar
 
-        div.request-list(v-if="requestGroups")
-          div(v-for="group in requestGroups")
-            h5 {{group._id}}
-            ul.list-group.col
-                ul.list-group-item(v-for="request in group.requests")
-                    div {{request.scene.granule_id}}
-                    div {{request.bands}}
-                    //- div {{request.status}}
-                    div(v-if="request.status === 'DONE'")
-                      div.badge.badge-success Completo
-                      button.btn.btn-link(@click="download(request)") Download
+      div.request-list(v-if="requestGroups")
+
+        div.request-group.shadow-sm(v-for="group in requestGroups")
+
+          div.group-info {{formatDate(group)}} - {{group.requests.length}} cenas
+
+          table.table.table-sm.table-light
+            thead
+              tr
+                th #
+                th Cena
+                th Composição de bandas
+                th Formato
+                th Status
+                th
+            tbody.table-hover
+              tr(v-for="(request, index) in group.requests")
+                th.text-center {{index}}
+                th {{request.scene.granule_id}}
+                th {{request.bands}}
+                th {{request.outputFormat}}
+                th
+                  div.badge.badge-success(v-if="request.status === 'DONE'") Completo
+                th
+                  button.btn.btn-link(
+                    v-if="request.status === 'DONE'",
+                    @click="download(request)") Download
 </template>
 
 <script>
@@ -48,6 +66,10 @@ export default {
     download(request) {
       sentinel.downloadScene(request);
     },
+    formatDate(group) {
+      const date = new Date(group.requestDate);
+      return `${date.toLocaleDateString('pt-br')} às ${date.toLocaleTimeString('pt-br')}`;
+    },
   },
   mounted() {
     this.update();
@@ -57,13 +79,34 @@ export default {
 
 <style lang="scss" scoped>
 
-.container {
+.wrapper {
   height: 100%;
+  padding: 20px;
+  background-color: white;
 }
 
 .request-list {
   height: 100%;
   overflow-y: auto;
+}
+
+.request-group {
+  background-color: #f5f5f5;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  .group-info {
+    padding: 5px;
+    font-size: 1.1em;
+  }
+}
+
+table {
+  th {
+    vertical-align: middle;
+  }
+  thead th {
+    padding: 0.5rem !important;
+  }
 }
 
 </style>

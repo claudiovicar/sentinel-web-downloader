@@ -94,6 +94,7 @@ router.get('/downloadStatus', (req, res) => {
 
   // SentinelDownloadRequest.find({})
   SentinelDownloadRequestGroup.find({})
+  .sort({'request_date': -1})
   .populate({
     path: 'requests',
     populate: {
@@ -114,7 +115,7 @@ router.get('/download/:downloadRequestId', (req, res) => {
 
   if (!req.downloadRequest) res.sendStatus(500);
 
-  const destinationFile = sentinelUtils.getSentinelRequestDestinationFolder(req.downloadRequest);
+  const destinationFile = sentinelUtils.getSentinelRequestDestinationFile(req.downloadRequest);
   const fileName = req.downloadRequest.scene.granule_id + '_' +
     req.downloadRequest.bands.toString().split(',').join('_') +
     '.' + req.downloadRequest.outputFormat;

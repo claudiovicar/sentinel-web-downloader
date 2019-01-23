@@ -13,7 +13,8 @@ var SentinelDownloadRequestSchema = new mongoose.Schema({
 });
 
 var SentinelDownloadRequestGroupSchema = new mongoose.Schema({
-  requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SentinelDownloadRequest' }]
+  requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SentinelDownloadRequest' }],
+  requestDate: { type: Date, default: Date.now }
 });
 
 var SentinelDownloadRequest = mongoose.model('SentinelDownloadRequest', SentinelDownloadRequestSchema);
