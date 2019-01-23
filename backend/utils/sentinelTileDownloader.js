@@ -14,6 +14,8 @@ const BAND_IMG_NAME = 'BANDA_';
 const PREVIEW_IMG_NAME = 'preview.jpg';
 const PREVIEW_TMP_IMG_NAME = 'preview.jp2';
 
+const DEFAULT_SRS = 'EPSG:4674';
+
 // Maps human-readable extensions to GDAL's format names
 const GDAL_OUTPUT_FORMATS = {
   'img': 'HFA',
@@ -62,7 +64,7 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
   downloadRequest.status = 'IN_PROGRESS';
   await downloadRequest.save();
 
-  const destinationFile = sentinelUtils.getSentinelRequestDestinationFolder(downloadRequest);
+  const destinationFile = sentinelUtils.getSentinelRequestDestinationFile(downloadRequest);
 
   if (fs.existsSync(destinationFile)) {
     downloadRequest.status = 'DONE';
@@ -81,30 +83,59 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
 
   return Promise.all(bandPromises)
     .then(() => {
-      const outputFormat = GDAL_OUTPUT_FORMATS[downloadRequest.outputFormat];
-      let comandoGDAL = `gdal_merge.py -separate -of ${outputFormat} -o ${destinationFile} `;
-      downloadedBandPaths.forEach((bandPath) => {
-        comandoGDAL += bandPath + ' ';
-      });
-
-      console.log(`Executando comando GDAL: ${comandoGDAL}`);
-      exec(comandoGDAL, function(err, stdout, stderr) {
-        if(err || stderr) {
-          console.log('Erro ao gerar composição de bandas ' + (err || stderr));
-          downloadRequest.status = 'ERROR';
-        }
-        else {
-          console.log('Composição de bandas gerada com sucesso');
-          downloadRequest.status = 'DONE';
-        }
-        downloadRequest.save();
-      });
-
-      // const translate = 'gdal_translate -ot Byte -scale -of HFA arq_temp arq_final';
+      generateFile(downloadRequest, downloadedBandPaths);
     })
     .catch(e => {
       console.log(e);
     });
+
+}
+
+async function generateFile(downloadRequest, downloadedBandPaths) {
+
+  const tempDestinationFile = sentinelUtils.getSentinelRequestDestinationFile(downloadRequest, {tmp: true});
+  const destinationFile = sentinelUtils.getSentinelRequestDestinationFile(downloadRequest);
+
+  const outputFormat = GDAL_OUTPUT_FORMATS[downloadRequest.outputFormat];
+
+  let comandoGDALMerge = `gdal_merge.py -separate -of ${outputFormat} -o ${tempDestinationFile} `;
+  downloadedBandPaths.forEach((bandPath) => {
+    comandoGDALMerge += bandPath + ' ';
+  });
+
+  let comandoGDALWarp = `gdalwarp -of ${outputFormat} -t_srs "${DEFAULT_SRS}" ${tempDestinationFile} ${destinationFile}`;
+
+  await runGDALCommand(comandoGDALMerge, downloadRequest);
+  await runGDALCommand(comandoGDALWarp, downloadRequest);
+
+  fs.unlinkSync(tempDestinationFile);
+
+}
+
+async function runGDALCommand(gdalCommand, downloadRequest) {
+
+  console.log(`Executando comando GDAL: ${gdalCommand}`);
+  return new Promise((resolve, reject) => {
+
+    exec(gdalCommand, function(err, stdout, stderr) {
+      if(err || stderr) {
+        console.log('Erro ao gerar composição de bandas ' + (err || stderr));
+        downloadRequest.status = 'ERROR';
+      }
+      else {
+        console.log('Composição de bandas gerada com sucesso');
+        downloadRequest.status = 'DONE';
+      }
+      return downloadRequest.save()
+        .then(resolve)
+        .catch(reject);
+    });
+
+  });
+
+}
+
+function reprojectRaster(downloadRequest) {
 
 }
 
