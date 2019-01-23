@@ -35,7 +35,7 @@
                 th {{request.bands}}
                 th {{request.outputFormat}}
                 th
-                  div.badge.badge-success(v-if="request.status === 'DONE'") Completo
+                  div.badge(:class="status[request.status].class") {{status[request.status].text}}
                 th
                   button.btn.btn-link(
                     v-if="request.status === 'DONE'",
@@ -45,10 +45,26 @@
 <script>
 import sentinel from '@/services/sentinel';
 
+const STATUS = {
+  DONE: {
+    text: 'Completo',
+    class: 'badge-success',
+  },
+  IN_PROGRESS: {
+    text: 'Em andamento',
+    class: 'badge-primary',
+  },
+  ERROR: {
+    text: 'Erro',
+    class: 'badge-danger',
+  },
+};
+
 export default {
   data() {
     return {
       requestGroups: null,
+      status: STATUS,
     };
   },
   methods: {
