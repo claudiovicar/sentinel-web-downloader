@@ -11,7 +11,7 @@
         div.icon-close.col-sm-2(@click="close")
             icon(name="times", scale="2")
 
-      ul.d-flex.justify-content-center.flex-wrap
+      ul.d-flex.justify-content-center.flex-wrap(ref="sceneList")
         li(v-for="scene in foundScenes[inspectedTile.id]")
           tile-preview(:scene="scene")
 
@@ -47,6 +47,13 @@ export default {
       'inspectedTile',
       'foundScenes',
     ]),
+  },
+  watch: {
+    inspectedTile() {
+      if (this.$refs.sceneList) {
+        this.$refs.sceneList.scrollTop = 0;
+      }
+    },
   },
 };
 </script>

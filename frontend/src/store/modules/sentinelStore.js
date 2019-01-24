@@ -91,7 +91,6 @@ export default {
         groupedScenes[scene.tile.id].push(scene);
       });
       state.foundScenes = groupedScenes;
-      Vue.set(state, 'currentView', VIEW_STATES.SCENE_SELECTION);
     },
     [SET_INSPECTED_TILE](state, tile) {
       Vue.set(state, 'inspectedTile', tile);
@@ -140,6 +139,7 @@ export default {
           context.commit(UNSELECT_TILE, tile);
         });
         context.commit(SET_SCENES, data);
+        context.commit(SET_CURRENT_VIEW, VIEW_STATES.SCENE_SELECTION);
       });
     },
     [SELECT_TILE](context, tile) {

@@ -39,9 +39,14 @@ export default {
     createMap() {
       this.map = L.map('map', MAP_CONFIG);
 
-      const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+      // const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+      //   maxZoom: 19,
+      //   attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+      // });
+
+      const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       });
 
       this.map.addLayer(baseLayer);
