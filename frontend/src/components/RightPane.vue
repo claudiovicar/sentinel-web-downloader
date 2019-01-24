@@ -4,7 +4,12 @@
 
     div.container
 
-      h2.mb-4 {{inspectedTile.id}} - {{foundScenes[inspectedTile.id].length}} cenas
+      div.row
+        div.col-sm-10
+          h2.mb-4 {{inspectedTile.id}} - {{foundScenes[inspectedTile.id].length}} cenas
+
+        div.icon-close.col-sm-2(@click="close")
+            icon(name="times", scale="2")
 
       ul.d-flex.justify-content-center.flex-wrap
         li(v-for="scene in foundScenes[inspectedTile.id]")
@@ -14,7 +19,10 @@
 
 <script>
 
+import Icon from 'vue-awesome';
+
 import { mapGetters } from 'vuex';
+import { SELECT_TILE } from '@/store/actions.type';
 
 import TilePreview from './TilePreview.vue';
 
@@ -22,11 +30,17 @@ export default {
   name: 'RightPane',
   components: {
     TilePreview,
+    Icon,
   },
   data() {
     return {
       showPane: true,
     };
+  },
+  methods: {
+    close() {
+      this.$store.dispatch(SELECT_TILE, null);
+    },
   },
   computed: {
     ...mapGetters([
@@ -38,16 +52,36 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
 
 .float-box {
   right: 0;
-  overflow-y: auto;
   background-color: #f3f3f3;
   padding: 15px;
+  height: 100%;
 }
 
-li {
-  margin-bottom: 5px;
+.container {
+  height: 100%;
+}
+
+ul {
+  height: 100%;
+  overflow-y: auto;
+  li {
+    margin-bottom: 5px;
+    position: relative;
+  }
+}
+
+.icon-close {
+  cursor: pointer;
+  &:hover {
+    color: grey;
+  }
+  .fa-icon {
+    color: $icon-color;
+  }
 }
 
 </style>
