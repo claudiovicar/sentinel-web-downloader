@@ -37,7 +37,11 @@ services:
       context: ./
       dockerfile: ./docker/server/Dockerfile
     volumes:
+      # Significa que, quando as imagens forem salvas nesse caminho, dentro do container,
+      # elas estarão sendo salvas, na verdade, na máquina local, no mesmo caminho.
       - ./backend:/usr/src/baixador-sentinel
+      - /usr/local/data/sentinel2:/usr/local/data/sentinel2
+    # container_name: node-with-gdal
     links:
       - mongo
     depends_on:
