@@ -54,6 +54,10 @@ const STATUS = {
     text: 'Em andamento',
     class: 'badge-primary',
   },
+  QUEUED: {
+    text: 'Na fila',
+    class: 'badge-primary',
+  },
   ERROR: {
     text: 'Erro',
     class: 'badge-danger',
