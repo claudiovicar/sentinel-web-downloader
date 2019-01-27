@@ -9,10 +9,10 @@
           h2.mb-4 {{inspectedTile.id}} - {{foundScenes[inspectedTile.id].length}} cenas
 
         div.icon-close.col-sm-2(@click="close")
-            icon(name="times", scale="2")
+          icon(name="times", scale="2")
 
       ul.d-flex.justify-content-center.flex-wrap(ref="sceneList")
-        li(v-for="scene in foundScenes[inspectedTile.id]")
+        li(v-for="scene in foundScenes[inspectedTile.id]", :key="scene._id")
           tile-preview(:scene="scene")
 
 </template>
