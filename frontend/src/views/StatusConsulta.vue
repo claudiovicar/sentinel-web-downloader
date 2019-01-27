@@ -8,10 +8,11 @@
     div.container.wrapper
 
       div.affix
-        h2
-            | Acompanhe o andamento dos downloads
+        h4
+          | Acompanhe o andamento dos downloads
 
-        label(@click="navigateBack()") Voltar
+          button.btn.btn-link(@click="navigateBack()") Voltar
+        label {{updateTime.toLocaleTimeString('pt-br')}}
 
       div.request-list(v-if="requestGroups")
 
@@ -44,6 +45,9 @@
 
 <script>
 import sentinel from '@/services/sentinel';
+import { clearInterval } from 'timers';
+
+const UPDATE_INTERVAL = 30 * 1000;
 
 const STATUS = {
   DONE: {
@@ -69,6 +73,7 @@ export default {
     return {
       requestGroups: null,
       status: STATUS,
+      updateTime: new Date(),
     };
   },
   methods: {
@@ -79,6 +84,7 @@ export default {
       sentinel.getDownloadStatus()
         .then((response) => {
           this.requestGroups = response.data;
+          this.updateTime = new Date();
         })
         // eslint-disable-next-line
         .catch(e => console.log(e));
@@ -93,7 +99,13 @@ export default {
   },
   mounted() {
     this.update();
+    this.interval = setInterval(() => {
+      this.update();
+    }, UPDATE_INTERVAL);
   },
+  beforeDestroy() {
+    clearInterval(this.interval);
+  }
 };
 </script>
 
