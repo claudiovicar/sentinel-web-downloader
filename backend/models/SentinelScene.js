@@ -7,7 +7,7 @@ var SentinelSceneSchema = new mongoose.Schema({
   tile: { type: mongoose.Schema.Types.ObjectId, ref: 'SentinelTile' },
   sensing_time: {type: Date},
   total_size: {type: Number},
-  cloud_cover: {type: String},
+  cloud_cover: {type: Number},
   geometric_quality_flag: {type: String},
   generation_time: {type: String},
   north_lat: {type: Number},
