@@ -11,7 +11,7 @@ const path = require('path');
 const exec = require('child_process').exec;
 
 const BAND_IMG_NAME = 'BANDA_';
-const PREVIEW_IMG_NAME = 'preview.jpg';
+const PREVIEW_IMG_NAME = 'preview.png';
 const PREVIEW_TMP_IMG_NAME = 'preview.jp2';
 
 const DEFAULT_SRS = 'EPSG:4674';
@@ -171,7 +171,7 @@ function downloadPreviewImage(scene) {
 
           if(err || stderr) {
             console.log('Erro ao converter JP2 para PNG ' + (err || stderr));
-            reject();
+            // reject();
           }
 
           resolve(destinationFile);
