@@ -11,10 +11,9 @@ div.tile-preview(@click="selectScene(scene)", :class="{'selected': isSelected()}
       icon.mr-2(name="calendar")
       span {{formattedDate}}
 
-  //- div.not-found
-    icon(name="unlink", scale="2")
-
-  img(:src='sceneURL')
+  img(:src='sceneURL', @load="onImageLoad()")
+  div.icon-loading(v-if="isLoading")
+    icon.fa-pulse(name="spinner", scale="3")
 
 </template>
 
@@ -34,6 +33,11 @@ export default {
   },
   components: {
     Icon,
+  },
+  data() {
+    return {
+      isLoading: true,
+    };
   },
   computed: {
     formattedDate() {
@@ -58,6 +62,9 @@ export default {
       const scenes = this.selectedScenes()[this.scene.tile.id];
       // eslint-disable-next-line
       return scenes && scenes.filter(scene => this.scene._id === scene._id).length;
+    },
+    onImageLoad() {
+      this.isLoading = false;
     },
   },
 };
@@ -92,15 +99,17 @@ img {
   width: 100%;
 }
 
-// .not-found {
-//   color: white;
-//   position: absolute;
-//   top: $size / 2;
-//   left: $size / 2;
-// }
-
 .fa-icon {
   margin-top: -5px;
+}
+
+.icon-loading {
+  color: white;
+  position: relative;
+  z-index: 100;
+  float: right;
+  top: 0px;
+  right: 20px;
 }
 
 </style>
