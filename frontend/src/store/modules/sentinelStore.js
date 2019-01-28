@@ -9,6 +9,7 @@ import {
   SET_INSPECTED_TILE,
   SET_SENTINEL_GRID,
   SET_SCENES_QUERY,
+  CLEAR_SCENES,
 } from '../mutations.type';
 
 import {
@@ -114,6 +115,9 @@ export default {
       state.foundScenes = null;
       state.scenesQuery = query;
     },
+    [CLEAR_SCENES](state) {
+      Vue.set(state.selectedScenes, {});
+    },
   },
 
   actions: {
@@ -136,7 +140,8 @@ export default {
       sentinel.filterScenes(selectedTiles, dateRange, cloudCover).then(({ data }) => {
         const tilesToRemove = [...context.state.selectedTiles];
         tilesToRemove.forEach((tile) => {
-          context.commit(UNSELECT_TILE, tile);
+          // context.commit(UNSELECT_TILE, tile);
+          context.commit(REMOVE_SELECTED_TILE, tile);
         });
         context.commit(SET_SCENES, data);
         context.commit(SET_CURRENT_VIEW, VIEW_STATES.SCENE_SELECTION);
@@ -156,6 +161,9 @@ export default {
         context.commit(SET_INSPECTED_TILE, null);
       }
     },
+    [SET_INSPECTED_TILE](context, tile) {
+      context.commit(SET_INSPECTED_TILE, tile);
+    },
     [SELECT_SCENE](context, scene) {
       context.commit(SELECT_SCENE, scene);
     },
@@ -166,6 +174,10 @@ export default {
     },
     [SET_CURRENT_VIEW](context, viewState) {
       context.commit(SET_CURRENT_VIEW, viewState);
+      if (viewState === VIEW_STATES.SEARCH) {
+        context.commit(SET_INSPECTED_TILE, null);
+        context.commit(CLEAR_SCENES);
+      }
     },
     [NOTIFY](context, options) {
       const type = options.type || 'info';

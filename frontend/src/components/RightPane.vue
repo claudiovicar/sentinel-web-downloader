@@ -22,7 +22,7 @@
 import Icon from 'vue-awesome';
 
 import { mapGetters } from 'vuex';
-import { SELECT_TILE } from '@/store/actions.type';
+import { SET_INSPECTED_TILE } from '@/store/mutations.type';
 
 import TilePreview from './TilePreview.vue';
 
@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     close() {
-      this.$store.dispatch(SELECT_TILE, null);
+      this.$store.dispatch(SET_INSPECTED_TILE, null);
     },
   },
   computed: {

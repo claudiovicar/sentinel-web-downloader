@@ -76,7 +76,7 @@
                 | Percentual de nuvens: {{scenesQuery.cloudCover}}%
 
           div.icon-return.col-sm-2(@click="backToSearch")
-            icon(name="arrow-left", scale="2")
+            icon(name="times", scale="2")
 
       div.scenes-list
         ul.list-group
@@ -165,7 +165,7 @@ export default {
         max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
       this.$store.dispatch(FILTER_SENTINEL_SCENES, {
-        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
+        selectedTiles: [...this.selectedTiles], dateRange, cloudCover: this.cloudCover,
       });
     },
     selectTile(tile) {
