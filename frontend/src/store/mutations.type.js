@@ -6,3 +6,4 @@ export const SET_SCENES_QUERY = 'setScenesQuery';
 export const ADD_SELECTED_TILE = 'selectTile';
 export const REMOVE_SELECTED_TILE = 'unselectTile';
 export const SET_INSPECTED_TILE = 'setInspectedTile';
+export const CLEAR_SCENES = 'clearScenes';

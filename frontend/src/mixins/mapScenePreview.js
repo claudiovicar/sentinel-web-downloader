@@ -1,6 +1,7 @@
 import L from 'leaflet';
 
 import { SELECT_SCENE } from '@/store/actions.type';
+import { CLEAR_SCENES } from '@/store/mutations.type';
 
 const sceneOverlayMap = {};
 
@@ -24,6 +25,14 @@ function createImageOverlay(tileId, scenes, bounds, map) {
   map.flyToBounds(bounds);
 }
 
+function removeAllOverlays(map) {
+  Object.keys(sceneOverlayMap).forEach((tileId) => {
+    sceneOverlayMap[tileId].forEach((overlay) => {
+      map.removeLayer(overlay);
+    });
+  });
+}
+
 export default {
   mounted() {
     this.$store.subscribe((mutation) => {
@@ -34,6 +43,8 @@ export default {
         const bounds = L.latLngBounds(fixedCoords);
         const selectedScenes = getters.selectedScenes[getters.inspectedTile.id];
         createImageOverlay(getters.inspectedTile.id, selectedScenes, bounds, this.map);
+      } else if (mutation.type === CLEAR_SCENES) {
+        removeAllOverlays(this.map);
       }
     });
   },

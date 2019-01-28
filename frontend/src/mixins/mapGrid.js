@@ -59,10 +59,12 @@ export default {
     },
     addGridToMap() {
       this.currentGrid.addTo(this.map);
-      this.map.fitBounds(this.currentGrid.getBounds());
     },
     removeGridFromMap() {
       this.currentGrid.removeFrom(this.map);
+    },
+    fitBounds() {
+      this.map.fitBounds(this.currentGrid.getBounds());
     },
     filterGrid() {
       const filteredFeatures = this.$store.getters.sentinelGrid.features
@@ -97,6 +99,7 @@ export default {
         // tileMap[mutation.payload.id].setStyle(MAP_STYLES.grid.default);
       } else if (mutation.type === SET_SENTINEL_GRID) {
         this.createGrid();
+        this.fitBounds();
       } else if (mutation.type === SET_INSPECTED_TILE) {
         if (mutation.payload) {
           this.zoomToTile();
@@ -105,9 +108,12 @@ export default {
         this.removeGridFromMap();
         if (mutation.payload === VIEW_STATES.SCENE_SELECTION) {
           this.filterGrid();
+          this.fitBounds();
         } else {
-          this.currentGrid = this.grid;
-          this.addGridToMap();
+          setTimeout(() => {
+            this.currentGrid = this.grid;
+            this.addGridToMap();
+          }, 100);
         }
       }
     });

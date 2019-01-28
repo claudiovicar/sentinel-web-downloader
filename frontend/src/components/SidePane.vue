@@ -54,7 +54,7 @@
                 min="0",
                 max="100")
 
-        button.btn.btn-primary.float-right(@click="filter()")
+        button.btn.btn-primary.float-right(@click="filter()", :disabled="!formValid")
           icon.mr-2(name="search")
           span Buscar
 
@@ -76,7 +76,7 @@
                 | Percentual de nuvens: {{scenesQuery.cloudCover}}%
 
           div.icon-return.col-sm-2(@click="backToSearch")
-            icon(name="arrow-left", scale="2")
+            icon(name="times", scale="2")
 
       div.scenes-list
         ul.list-group
@@ -165,7 +165,7 @@ export default {
         max: this.selectedDates ? this.selectedDates[1].toISOString() : this.dateRange.max,
       };
       this.$store.dispatch(FILTER_SENTINEL_SCENES, {
-        selectedTiles: this.selectedTiles, dateRange, cloudCover: this.cloudCover,
+        selectedTiles: [...this.selectedTiles], dateRange, cloudCover: this.cloudCover,
       });
     },
     selectTile(tile) {
@@ -180,7 +180,9 @@ export default {
     downloadScenes() {
       let scenes = [];
       Object.keys(this.selectedScenes).forEach((tileId) => {
-        scenes = scenes.concat(this.selectedScenes[tileId]);
+        if (this.selectedScenes[tileId]) {
+          scenes = scenes.concat(this.selectedScenes[tileId]);
+        }
       });
       const bandArray = this.outputBandComposition.split(',');
       sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
@@ -230,9 +232,9 @@ export default {
         return false;
       });
     },
-    // countScenes() {
-    //   return Object.keys(this.scenes).length;
-    // },
+    formValid() {
+      return this.selectedTiles.length && this.selectedDates.length && !!this.cloudCover;
+    },
   },
   watch: {
     isSearching() {
@@ -245,7 +247,6 @@ export default {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
     [this.outputFileFormat] = this.outputFormats;
-    // TODO: Update sentinelTiles (para funcionar ao voltar da tela de downloads)
   },
 };
 </script>
