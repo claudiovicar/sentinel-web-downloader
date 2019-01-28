@@ -135,14 +135,15 @@ export default {
         context.commit(SET_DATE_RANGE, dates);
       });
     },
-    [FILTER_SENTINEL_SCENES](context, { selectedTiles, dateRange, cloudCover }) {
+    [FILTER_SENTINEL_SCENES](context, { dateRange, cloudCover }) {
+      const { selectedTiles } = context.state;
       context.commit(SET_SCENES_QUERY, { selectedTiles, dateRange, cloudCover });
-      sentinel.filterScenes(selectedTiles, dateRange, cloudCover).then(({ data }) => {
-        const tilesToRemove = [...context.state.selectedTiles];
-        tilesToRemove.forEach((tile) => {
-          // context.commit(UNSELECT_TILE, tile);
-          context.commit(REMOVE_SELECTED_TILE, tile);
-        });
+      sentinel.filterScenes(context.state.selectedTiles, dateRange, cloudCover).then(({ data }) => {
+        // const tilesToRemove = [...context.state.selectedTiles];
+        // tilesToRemove.forEach((tile) => {
+        //   // context.commit(UNSELECT_TILE, tile);
+        //   context.commit(REMOVE_SELECTED_TILE, tile);
+        // });
         context.commit(SET_SCENES, data);
         context.commit(SET_CURRENT_VIEW, VIEW_STATES.SCENE_SELECTION);
       });
