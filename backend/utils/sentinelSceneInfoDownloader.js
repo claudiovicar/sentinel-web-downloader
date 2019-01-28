@@ -67,7 +67,6 @@ function unzip(path, dest) {
   return asyncGunzip(path, dest);
 }
 
-// TODO: Transformar em async
 async function readAndInsertCSV(path, lastUpdateDate) {
 
   console.log(`Lendo CSV ${path}`);
@@ -77,9 +76,6 @@ async function readAndInsertCSV(path, lastUpdateDate) {
   const stream = fs.createReadStream(path);
 
   let registers = [];
-
-  // TODO: Obter último id ou data inserida no banco.
-  // No on("data"), abaixo, limitar àqueles não inseridos ainda.
 
   return new Promise((resolve, reject) => {
 
@@ -137,10 +133,9 @@ async function readAndInsertCSV(path, lastUpdateDate) {
 // Abre o geojson do brasil
 // Extrai os tile_ids
 // Insere em um array
-// TODO: Colocar o path do geojson do brasil no .env
 function fillTileIds() {
 
-  let geojson = JSON.parse(fs.readFileSync('public/geojson/sentinel-grid.geojson', 'utf8'));
+  let geojson = JSON.parse(fs.readFileSync(process.env.PATH_GEOJSON_BRASIL, 'utf8'));
 
   geojson.features.forEach(feature => {
 
