@@ -180,7 +180,9 @@ export default {
     downloadScenes() {
       let scenes = [];
       Object.keys(this.selectedScenes).forEach((tileId) => {
-        scenes = scenes.concat(this.selectedScenes[tileId]);
+        if (this.selectedScenes[tileId]) {
+          scenes = scenes.concat(this.selectedScenes[tileId]);
+        }
       });
       const bandArray = this.outputBandComposition.split(',');
       sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
@@ -245,7 +247,6 @@ export default {
     this.$store.dispatch(FETCH_SENTINEL_TILES);
     this.$store.dispatch(FETCH_SENTINEL_DATE_RANGE);
     [this.outputFileFormat] = this.outputFormats;
-    // TODO: Update sentinelTiles (para funcionar ao voltar da tela de downloads)
   },
 };
 </script>
