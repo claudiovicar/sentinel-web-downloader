@@ -54,7 +54,7 @@
                 min="0",
                 max="100")
 
-        button.btn.btn-primary.float-right(@click="filter()")
+        button.btn.btn-primary.float-right(@click="filter()", :disabled="!formValid")
           icon.mr-2(name="search")
           span Buscar
 
@@ -230,9 +230,9 @@ export default {
         return false;
       });
     },
-    // countScenes() {
-    //   return Object.keys(this.scenes).length;
-    // },
+    formValid() {
+      return this.selectedTiles.length && this.selectedDates.length && !!this.cloudCover;
+    },
   },
   watch: {
     isSearching() {
