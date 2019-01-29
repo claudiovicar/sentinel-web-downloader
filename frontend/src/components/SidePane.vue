@@ -233,7 +233,8 @@ export default {
       });
     },
     formValid() {
-      return this.selectedTiles.length && this.selectedDates.length && !!this.cloudCover;
+      // return this.selectedTiles.length && this.selectedDates.length && !!this.cloudCover;
+      return this.selectedTiles.length && !!this.cloudCover;
     },
   },
   watch: {
