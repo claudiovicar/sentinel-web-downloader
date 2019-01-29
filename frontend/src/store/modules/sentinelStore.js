@@ -21,12 +21,24 @@ import {
   UNSELECT_TILE,
   SELECT_SCENE,
   SET_CURRENT_VIEW,
+  LOAD_FROM_STORAGE,
   NOTIFY,
 } from '../actions.type';
 
 import geo from '@/services/geo';
 import sentinel from '@/services/sentinel';
 import { VIEW_STATES } from '@/config';
+
+function saveToStorage(key, value) {
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function loadFromStorage(key) {
+  if (window.localStorage.getItem(key)) {
+    return JSON.parse(window.localStorage.getItem(key));
+  }
+  return null;
+}
 
 export default {
 
@@ -113,7 +125,13 @@ export default {
     },
     [SET_SCENES_QUERY](state, query) {
       state.foundScenes = null;
-      state.scenesQuery = query;
+      Vue.set(state, 'scenesQuery', query);
+      saveToStorage('scenesQuery', query);
+    },
+    [LOAD_FROM_STORAGE](state, { selectedTiles, selectedDates, cloudCover }) {
+      Vue.set(state, 'selectedTiles', selectedTiles);
+      Vue.set(state, 'selectedDates', selectedDates);
+      Vue.set(state, 'cloudCover', cloudCover);
     },
     [CLEAR_SCENES](state) {
       Vue.set(state.selectedScenes, {});
@@ -139,11 +157,6 @@ export default {
       const { selectedTiles } = context.state;
       context.commit(SET_SCENES_QUERY, { selectedTiles, dateRange, cloudCover });
       sentinel.filterScenes(context.state.selectedTiles, dateRange, cloudCover).then(({ data }) => {
-        // const tilesToRemove = [...context.state.selectedTiles];
-        // tilesToRemove.forEach((tile) => {
-        //   // context.commit(UNSELECT_TILE, tile);
-        //   context.commit(REMOVE_SELECTED_TILE, tile);
-        // });
         context.commit(SET_SCENES, data);
         context.commit(SET_CURRENT_VIEW, VIEW_STATES.SCENE_SELECTION);
       });
@@ -180,10 +193,16 @@ export default {
         context.commit(CLEAR_SCENES);
       }
     },
+    /** Não utilizado, no momento */
+    [LOAD_FROM_STORAGE](context) {
+      const scenesQuery = loadFromStorage('scenesQuery');
+      context.commit(LOAD_FROM_STORAGE, scenesQuery);
+    },
     [NOTIFY](context, options) {
       const type = options.type || 'info';
       // eslint-disable-next-line
       this._vm.$snotify[type](options.content, options.title, options);
     },
   },
+
 };

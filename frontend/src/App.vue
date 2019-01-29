@@ -5,6 +5,17 @@
         router-view
 </template>
 
+<script>
+// import { LOAD_FROM_STORAGE } from '@/store/actions.type';
+
+// export default {
+//   mounted() {
+//     this.$store.dispatch(LOAD_FROM_STORAGE);
+//   },
+// };
+</script>
+
+
 <style lang="scss">
 #app {
   height: 100%;

@@ -50,7 +50,7 @@ export default {
         this.lastUpdateDate = new Date(response.data);
       })
       .catch(() => {
-        // Exibir alerta
+        // TODO: Exibir alerta
       });
   },
 };
