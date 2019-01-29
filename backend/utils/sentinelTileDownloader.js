@@ -107,7 +107,7 @@ async function generateFile(downloadRequest, downloadedBandPaths) {
   await runGDALCommand(comandoGDALMerge, downloadRequest);
   await runGDALCommand(comandoGDALWarp, downloadRequest);
 
-  fs.unlinkSync(tempDestinationFile);
+  removeTemporaryFiles(tempDestinationFile, downloadedBandPaths);
 
 }
 
@@ -194,6 +194,18 @@ function createDestinationFolder(scene) {
   fileUtils.createFolder(destFolder);
 
   return destFolder;
+
+}
+
+function removeTemporaryFiles(tempComposition, bands) {
+
+  console.info('Removendo arquivos temporários...');
+
+  fs.unlinkSync(tempComposition);
+
+  bands.forEach(band => {
+    fs.unlinkSync(band);
+  });
 
 }
 
