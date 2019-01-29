@@ -12,7 +12,7 @@
           | Acompanhe o andamento dos downloads
 
           button.btn.btn-link(@click="navigateBack()") Voltar
-        label {{updateTime.toLocaleTimeString('pt-br')}}
+        label Atualizado em {{updateTime.toLocaleTimeString('pt-br')}} (Próxima atualização em {{this.updateInterval / 1000}} segundos)
 
       div.request-list(v-if="requestGroups")
 
@@ -47,8 +47,6 @@
 import sentinel from '@/services/sentinel';
 import { clearInterval } from 'timers';
 
-const UPDATE_INTERVAL = 30 * 1000;
-
 const STATUS = {
   DONE: {
     text: 'Completo',
@@ -74,6 +72,7 @@ export default {
       requestGroups: null,
       status: STATUS,
       updateTime: new Date(),
+      updateInterval: 30 * 1000
     };
   },
   methods: {
@@ -101,7 +100,7 @@ export default {
     this.update();
     this.interval = setInterval(() => {
       this.update();
-    }, UPDATE_INTERVAL);
+    }, this.updateInterval);
   },
   beforeDestroy() {
     clearInterval(this.interval);
