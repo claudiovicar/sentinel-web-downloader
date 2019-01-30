@@ -1,7 +1,9 @@
 var router = require('express').Router();
 
 router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Okey' });
+	let path = 'app/index.html';
+	res.sendFile(path, {root: './public'});
+  // res.status(200).json({ message: 'Okey' });
 });
 
 router.use('/geo', require('./api/geo'));

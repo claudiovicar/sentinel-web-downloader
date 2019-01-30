@@ -15,6 +15,7 @@ const flash = require('express-flash');
 const path = require('path');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const history = require('connect-history-api-fallback');
 const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 // const multer = require('multer');
@@ -119,7 +120,7 @@ app.use((req, res, next) => {
 //   }
 //   next();
 // });
-app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+
 // app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
 // app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
 // app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
@@ -149,6 +150,15 @@ app.use(require('./routes'));
 // app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 // app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 // app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
+const staticFilesMiddleware = express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 });
+app.use('/public', staticFilesMiddleware);
+app.use(history({
+  index: '/public/app/index.html'
+}));
+app.use(staticFilesMiddleware);
+
+// app.use('/public');
 
 /**
  * API examples routes.

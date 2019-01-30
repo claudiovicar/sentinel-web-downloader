@@ -6,7 +6,7 @@ const development = process.env.NODE_ENV === 'development';
 module.exports = {
   outputDir: '../backend/public/app',
   indexPath: './index.html',
-  baseUrl: development ? '/' : `${httpPath}/app`,
+  baseUrl: development ? '/' : `/public/app/`,
   runtimeCompiler: true,
 
   // configure webpack-dev-server behavior
