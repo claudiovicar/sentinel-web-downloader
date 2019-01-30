@@ -3,12 +3,10 @@
 ### Executando:
 
  - Frontend: `npm run serve`
- - Backend: `nodemon app.js`
  - Raiz: `sudo docker-compose build; sudo docker-compose up`
 
 
-## Docker
-
+## Alguns comandos Docker
  - sudo docker ps -l
  - sudo docker images
 
