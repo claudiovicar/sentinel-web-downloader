@@ -12,7 +12,9 @@
           | Acompanhe o andamento dos downloads
 
           button.btn.btn-link(@click="navigateBack()") Voltar
-        label Atualizado em {{updateTime.toLocaleTimeString('pt-br')}} (Próxima atualização em {{this.updateInterval / 1000}} segundos)
+        label
+          | Atualizado em {{updateTime.toLocaleTimeString('pt-br')}}
+          | &nbsp(Próxima atualização em {{this.updateInterval / 1000}} segundos)
 
       div.request-list(v-if="requestGroups")
 
@@ -72,7 +74,7 @@ export default {
       requestGroups: null,
       status: STATUS,
       updateTime: new Date(),
-      updateInterval: 30 * 1000
+      updateInterval: 30 * 1000,
     };
   },
   methods: {
