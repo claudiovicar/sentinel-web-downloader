@@ -141,7 +141,14 @@ function fillTileIds() {
 
     tileIDs.push(feature.properties.TileID);
 
-    SentinelTile.findOneOrCreate({id: feature.properties.TileID});
+    SentinelTile.findOne({id: feature.properties.TileID})
+      .exec()
+      .then((tile) => {
+        if (!tile)
+          new SentinelTile({id: feature.properties.TileID}).save();
+      });
+
+    // SentinelTile.findOneOrCreate({id: feature.properties.TileID});
     // new SentinelTile({id: feature.properties.TileID}).save();
 
   });
