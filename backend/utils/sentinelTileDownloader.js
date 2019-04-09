@@ -77,7 +77,8 @@ async function downloadAndGenerateBandComposition(downloadRequest) {
     const bandURL = manifestUtils.getResourceURL(downloadRequest.scene, 'IMG_DATA', `B0${bandNumber}.jp2`);
     const destFile = path.join(sentinelUtils.getDestinationFolder(downloadRequest.scene), BAND_IMG_NAME + bandNumber + '.jp2');
     downloadedBandPaths.push(destFile);
-    bandPromises.push(fileUtils.download(bandURL, destFile, {skip: true}));
+    // bandPromises.push(fileUtils.download(bandURL, destFile, {skip: true}));
+    bandPromises.push(fileUtils.downloadFromGoogleCloud(bandURL, destFile, {skip: true}));
   });
 
   return Promise.all(bandPromises)
@@ -162,7 +163,7 @@ function downloadPreviewImage(scene) {
 
   const previewURL = manifestUtils.getResourceURL(scene, 'Preview');
 
-  return fileUtils.download(previewURL, tempPreviewFile, {})
+  return fileUtils.downloadFromGoogleCloud(previewURL, tempPreviewFile, {})
     .then(() => {
 
       return new Promise((resolve, reject) => {

@@ -80,7 +80,9 @@ function getResourceURL(scene, pattern, resourcePattern) {
       // const baseURL = scene.base_url.replace('gs://', GOOGLE_STORAGE_URL);
       const resourceURL = object['byteStream'][0].fileLocation[0]['$'].href;
       if (!resourcePattern || resourceURL.match(resourcePattern)) {
-        return url.resolve(GOOGLE_STORAGE_URL, path.join(scene.base_url.replace('gs://', ''), resourceURL));
+        // return url.resolve(GOOGLE_STORAGE_URL, path.join(scene.base_url.replace('gs://', ''), resourceURL));
+        // return url.resolve(GOOGLE_STORAGE_URL, path.join(scene.base_url, resourceURL));
+        return path.join(scene.base_url, resourceURL).replace('gs:/', 'gs://');
       }
     }
   }
