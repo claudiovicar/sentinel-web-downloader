@@ -184,7 +184,7 @@ export default {
           scenes = scenes.concat(this.selectedScenes[tileId]);
         }
       });
-      const bandArray = this.outputBandComposition.split(',').map(b => parseInt(b));
+      const bandArray = this.outputBandComposition.split(',').map(b => parseInt(b, 10));
       sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
         .then(() => {
           this.$snotify.confirm('Visite a página de consulta de cenas para verificar o andamento dos downloads.',
