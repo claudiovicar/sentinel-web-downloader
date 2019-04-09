@@ -153,7 +153,7 @@ export default {
       expanded: false,
       selectedDates: [],
       cloudCover: 5,
-      outputBandComposition: '4,3,2',
+      outputBandComposition: '8,4,3,2',
       outputFormats: ['img', 'tiff'],
       outputFileFormat: 'img',
     };
@@ -184,7 +184,7 @@ export default {
           scenes = scenes.concat(this.selectedScenes[tileId]);
         }
       });
-      const bandArray = this.outputBandComposition.split(',');
+      const bandArray = this.outputBandComposition.split(',').map(b => parseInt(b));
       sentinel.generateComposition(scenes, bandArray, this.outputFileFormat)
         .then(() => {
           this.$snotify.confirm('Visite a página de consulta de cenas para verificar o andamento dos downloads.',
