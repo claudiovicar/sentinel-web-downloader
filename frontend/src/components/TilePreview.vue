@@ -13,7 +13,7 @@ div.tile-preview(@click="selectScene(scene)", :class="{'selected': isSelected()}
 
   img(:src='sceneURL', @load="onImageLoad()")
   div.icon-loading(v-if="isLoading")
-    icon.fa-pulse(name="spinner", scale="3")
+    icon.fa-pulse(name="spinner", scale="2")
 
 </template>
 
@@ -108,8 +108,8 @@ img {
   position: relative;
   z-index: 100;
   float: right;
-  top: 0px;
-  right: 20px;
+  top: -5px;
+  right: 10px;
 }
 
 </style>

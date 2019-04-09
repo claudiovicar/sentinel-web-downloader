@@ -13,10 +13,10 @@ export const MAP_STYLES = {
       // color: 'orange',
       color: '#007bff',
       weight: 2,
-      // fill: 'white',
-      fill: false,
+      fillColor: 'white',
+      // fill: false,
       // fillOpacity: 0.01,
-      fillOpacity: 0.2,
+      fillOpacity: 0.1,
     },
   },
   brasil: {
