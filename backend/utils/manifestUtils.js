@@ -60,6 +60,7 @@ function manifestXML2JSON(manifestXMLPath, scene) {
 
       fs.writeFileSync(destinationFile, JSON.stringify(result));
 
+      console.log('Parsing complete!');
       resolve(destinationFile);
     });
 

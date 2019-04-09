@@ -6,8 +6,10 @@ var mkdirp = require('mkdirp');
 
 const download = function(url, dest, options, callback) {
 
-  if(options && options.skip && fs.existsSync(dest) && callback) {
-    callback(null, dest);
+  if(options && options.skip && fs.existsSync(dest)) {
+    if (callback) {
+      callback(null, dest);
+    }
     return;
   }
 
