@@ -1,5 +1,5 @@
 {
-  "name": "baixador-sentinel",
+  "name": "baixador_sentinel",
   "version": "5.1.1",
   "description": "Aplicação node + vue para consultar, baixar e processar imagens Sentinel",
   "repository": {
