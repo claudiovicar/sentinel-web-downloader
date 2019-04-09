@@ -1,8 +1,8 @@
 <template lang="pug">
 
-  div.float-box.col-sm-6.col-lg-3(v-if="inspectedTile")
+  div.float-box(v-if="inspectedTile")
 
-    div.container
+    div.float-box_inner
 
       div.row
         div.col-sm-10
@@ -64,19 +64,21 @@ export default {
 .float-box {
   right: 0;
   background-color: #f3f3f3;
-  padding: 15px;
+  padding: 0 15px;
   height: 100%;
+  width: 540px;
 }
 
-.container {
+.float-box_inner {
   height: 100%;
 }
 
 ul {
   height: 100%;
   overflow-y: auto;
+  padding-bottom: 200px;
   li {
-    margin-bottom: 5px;
+    margin: 5px;
     position: relative;
   }
 }

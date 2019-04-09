@@ -72,7 +72,7 @@ export default {
 
 <style lang="scss" scoped>
 
-$size: 360px;
+$size: 220px;
 
 .tile-preview {
   cursor: pointer;
