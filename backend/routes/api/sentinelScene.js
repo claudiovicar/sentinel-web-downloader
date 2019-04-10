@@ -64,7 +64,7 @@ router.get('/:id/preview', (req, res) => {
 
   if (!req.scene) res.sendStatus(500);
 
-  tileDownloader.downloadPreview(req.scene)
+  tileDownloader.queueDownloadPreview(req.scene)
   .then((imagePath) => {
     console.log(imagePath);
     res.sendFile(imagePath);

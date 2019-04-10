@@ -22,6 +22,9 @@ const GDAL_OUTPUT_FORMATS = {
   'tiff': 'GTIFF'
 };
 
+let previewQueue = {};
+const PREVIEW_THROTTLE = 8;
+
 async function downloadBands(scenes, outputFormat = 'img', bandComposition = [4,3,2]) {
 
   const requestGroup = new SentinelDownloadRequestGroup();
@@ -135,7 +138,14 @@ async function runGDALCommand(gdalCommand, downloadRequest) {
 
 }
 
-function reprojectRaster(downloadRequest) {
+// Agenda requisições para não ser bloqueado pelo Google Cloud Storage
+function queueDownloadPreview(scene) {
+
+  if(!previewQueue[scene._id]) {
+    previewQueue[scene._id] = scene;
+  }
+
+  return downloadPreview(scene);
 
 }
 
@@ -148,6 +158,19 @@ function downloadPreview(scene) {
       resolve(destinationFile);
     });
   }
+
+  // Permite, no máximo, PREVIEW_THROTTLE requisições simultâneas
+  if(Object.keys(previewQueue).length >= PREVIEW_THROTTLE) {
+    let interval = setInterval(() => {
+      if(Object.keys(previewQueue).length < PREVIEW_THROTTLE || !previewQueue[scene._id]) {
+        clearInterval(interval);
+      } else {
+        console.log(`Cena ${scene._id} está esperando para ter o preview baixado.`);
+      }
+    }, 2000);
+  }
+
+  console.log(`Baixando preview da cena ${scene._id}`);
 
   return manifestUtils.downloadManifest(scene)
     .then(() => {
@@ -174,6 +197,8 @@ function downloadPreviewImage(scene) {
             console.log('Erro ao converter JP2 para PNG ' + (err || stderr));
             // reject();
           }
+
+          delete previewQueue[scene._id];
 
           resolve(destinationFile);
 
@@ -210,4 +235,4 @@ function removeTemporaryFiles(tempComposition, bands) {
 
 }
 
-module.exports = {downloadPreview, downloadBands};
+module.exports = {queueDownloadPreview, downloadBands};
