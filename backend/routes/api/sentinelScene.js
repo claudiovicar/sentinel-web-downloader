@@ -124,4 +124,14 @@ router.get('/download/:downloadRequestId', (req, res) => {
 
 });
 
+router.post('/downloadList', (req, res) => {
+
+  if (!req.body.scenes) res.sendStatus(500);
+
+  // Obter as cenas do banco e devolver um CSV com os campos de interesse
+
+  res.sendStatus(200);
+
+});
+
 module.exports = router;

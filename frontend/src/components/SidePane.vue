@@ -112,6 +112,10 @@
                 v-model="outputFileFormat")
                 option(v-for="format in outputFormats", :value="format") {{format}}
 
+          button.btn.btn-success.float-left.mt-4(@click="downloadList()")
+            icon.mr-2(name="list-alt")
+            span Baixar lista de cenas
+
           button.btn.btn-primary.float-right.mt-4(@click="downloadScenes()")
             icon.mr-2(name="file-download")
             span Baixar cenas
@@ -176,6 +180,22 @@ export default {
     },
     formattedDate(date) {
       return new Date(date).toLocaleDateString('pt-br');
+    },
+    downloadList() {
+      let scenes = [];
+      Object.keys(this.selectedScenes).forEach((tileId) => {
+        this.selectedScenes[tileId].forEach((scene) => {
+          // eslint-disable-next-line
+          scenes.push(scene._id);
+        });
+      });
+      sentinel.downloadList(scenes)
+        .then(() => {
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          window.alert('Erro no download');
+        });
     },
     downloadScenes() {
       let scenes = [];
@@ -280,7 +300,7 @@ export default {
 
 .scenes-list {
   ul.list-group {
-    max-height: 460px;
+    max-height: 375px;
     overflow-y: auto;
 
     li.list-group-item {

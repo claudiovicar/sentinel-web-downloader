@@ -71,12 +71,12 @@ export default {
 
 .float-box_inner {
   height: 100%;
+  padding-bottom: 160px;
 }
 
 ul {
   height: 100%;
   overflow-y: auto;
-  padding-bottom: 200px;
   li {
     margin: 5px;
     position: relative;

@@ -38,4 +38,9 @@ export default {
     window.location.href = `${BASE_URL}/scenes/download/${request._id}`;
   },
 
+  downloadList(scenes) {
+    const params = {scenes};
+    return http.post(`${BASE_URL}/scenes/downloadList`, params);
+  },
+
 };
