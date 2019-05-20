@@ -39,7 +39,7 @@ export default {
   },
 
   downloadList(scenes) {
-    const params = {scenes};
+    const params = { scenes };
     return http.post(`${BASE_URL}/scenes/downloadList`, params);
   },
 
