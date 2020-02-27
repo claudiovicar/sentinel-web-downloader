@@ -182,7 +182,7 @@ export default {
       return new Date(date).toLocaleDateString('pt-br');
     },
     downloadList() {
-      let scenes = [];
+      const scenes = [];
       Object.keys(this.selectedScenes).forEach((tileId) => {
         this.selectedScenes[tileId].forEach((scene) => {
           // eslint-disable-next-line
@@ -190,11 +190,14 @@ export default {
         });
       });
       sentinel.downloadList(scenes)
-        .then(() => {
+        .then((data) => {
+          // eslint-disable-next-line
+          window.alert(data);
         })
         .catch((error) => {
           // eslint-disable-next-line
-          window.alert('Erro no download');
+          window.alert(error);
+          // window.alert('Erro no download');
         });
     },
     downloadScenes() {

@@ -103,8 +103,6 @@ app.use(history({
 }));
 app.use(staticFilesMiddleware);
 
-
-
 /**
  * Error Handler.
  */
